@@ -2,6 +2,15 @@
 set -euo pipefail
 
 # Keep pi-web credentials and config inside the project (not tracked by git).
-export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$(cd -- "$(dirname -- "$0")" && pwd)/.pi-web}"
+PI_DIR="$(cd -- "$(dirname -- "$0")" && pwd)/.pi-web"
+export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$PI_DIR}"
+
+# On first run, seed .pi-web/ with existing provider/model config from ~/.pi/agent.
+if [ ! -d "$PI_DIR" ]; then
+  mkdir -p "$PI_DIR"
+  if [ -f "$HOME/.pi/agent/models.json" ]; then
+    cp "$HOME/.pi/agent/models.json" "$PI_DIR/models.json"
+  fi
+fi
 
 exec npx @agegr/pi-web@latest -p 10000
