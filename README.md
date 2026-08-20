@@ -21,7 +21,7 @@ This repo is a lightweight, opinionated starting point for working with an AI ag
    ./agent
    ```
 
-   This runs the agent web UI on `http://127.0.0.1:10000`. Then open the project in your agent of choice (Devin CLI, Claude Code, Cursor, etc.) and start a session from this directory.
+   This runs the agent web UI on `http://127.0.0.1:10000`. Provider keys and credentials are stored in a local `.pi-web/` folder (gitignored), so nothing sensitive is committed. Then open the project in your agent of choice (Devin CLI, Claude Code, Cursor, etc.) and start a session from this directory.
 
 3. **Ask it to help with your routine tasks**
 

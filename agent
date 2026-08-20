@@ -1,3 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
+
+# Keep pi-web credentials and config inside the project (not tracked by git).
+export PI_CODING_AGENT_DIR="${PI_CODING_AGENT_DIR:-$(cd -- "$(dirname -- "$0")" && pwd)/.pi-web}"
+
 exec npx @agegr/pi-web@latest -p 10000
