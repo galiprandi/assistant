@@ -59,10 +59,15 @@ Before automating a specific web app, **read the corresponding guide** in `sites
 | Gmail | `sites/gmail_com/guide.md` | Before any Gmail operation (compose, reply, read inbox, search, delete) |
 | LinkedIn | `sites/linkedin_com/guide.md` | Before any LinkedIn operation (messaging, connections, jobs, Easy Apply, notifications) |
 | Microsoft Teams | `sites/teams_com/guide.md` | Before any Teams operation (send/delete messages via chatsvc API, token extraction) |
+| Outlook Web | `sites/outlook_office_com/guide.md` | Before any Outlook Web operation (read, compose, reply, archive, search) |
+| WhatsApp Web | `sites/whatsapp_com/guide.md` | Before any WhatsApp operation (send messages, read conversations, voice notes) |
+| Discord | `sites/discord_com/guide.md` | Before any Discord operation (messaging, navigation, voice) |
 | Jira | `sites/jira_com/guide.md` | Before any Jira operation (create issue, add comment, transition status) |
 | Teamtailor | `sites/teamtailor_com/guide.md` | Before applying to jobs on Teamtailor-based career sites |
 | Humand.co | `sites/humand_co/guide.md` | Before applying to jobs on Humand.co-based career sites |
 | Reddit | `sites/reddit_com/guide.md` | Before any Reddit operation (reading posts/comments, posting submissions, replying to comments, posting in megathreads) |
+| Google Maps | `sites/google_com/maps-guide.md` | Before any Google Maps operation (search, directions, navigation, layers) |
+| Facebook | `sites/facebook_com/guide.md` | Before any Facebook operation (groups, feed, chat, posts) |
 
 **How to load:** read the file with your read tool. Example: `read .agents/skills/browser-automation/sites/gmail_com/guide.md`
 
@@ -143,7 +148,7 @@ These rules were validated through extensive testing. Breaking them causes failu
 4. **Use URLs directly, not clicks for navigation** — `goto "https://..."` is more reliable than clicking nav links.
 5. **Verify with DOM content, not URL** — SPAs update content without changing the URL. Check DOM state with `eval`.
 6. **Batch operations into a single eval call** — Wait + click + verify in one `eval` is more robust than multiple CLI calls.
-7. **Contribute back what you learn** — When you discover a shortcut, a faster way to do something, or automate a common app/service that other agents could use, you MUST contribute it back to this skill. Create or update a guide in `sites/` following `sites/CONTRIBUTING.md`. The skill's source repo is `galiprandi/skills` — open a PR. This is how the agent ecosystem self-improves: every agent's discoveries feed the next one.
+7. **Always prefer keyboard shortcuts over UI clicks** — When a web app provides keyboard shortcuts, use them. They are faster, more reliable, and don't depend on generated CSS classes or DOM structure that changes between updates. **Before automating any web app, invest time researching whether it has keyboard shortcuts.** Check the app's help/FAQ, search for "keyboard shortcuts <app name>", or try common patterns (`Ctrl+/`, `Ctrl+.`, `?`, `Ctrl+K`). Most modern web apps (Gmail, Outlook, Teams, WhatsApp, Discord, LinkedIn) have extensive shortcut sets. Use `playwright-cli press <key>` to trigger them. If a shortcut exists for an action, never click a button to do the same thing.
 
 **Chaining:** Chain `open && eval` in a single shell command to prevent session death between calls.
 

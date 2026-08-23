@@ -5,13 +5,13 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "agent-desk/SKILL.md",
-      "computedHash": "7e1bda7b35d4f81571f2f60374b0f97c33e421c92afa62113d1558449421dcae"
+      "computedHash": "9aa0992c4b0357b51f97d79577519cb6497f018d8cad770c70f1fb90c471fd05"
     },
     "browser-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "a14b1ebd8292cef4b4810543c1a957d4f03a846e599191b0653cea4527e08217"
+      "computedHash": "4e02c1c0f492bcb1db7f85aeb47627f6b2ff77e8d338fa5fd1fead93e107c0b5"
     }
   }
 }
