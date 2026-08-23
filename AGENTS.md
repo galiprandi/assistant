@@ -76,7 +76,7 @@ Read the full SKILL.md for commands, options, and site-specific guides.
 
 ### agent-desk
 
-**Purpose:** Your control center. Manage tasks, events, sessions, links, and config via a sync API (`window.agentAPI`). The dashboard is your homepage in the browser.
+**Purpose:** Your **primary database** and control center. Manage tasks, events, sessions, links, and config via a sync API (`window.agentAPI`). The dashboard is your homepage in the browser. Every task starts here — other apps are delivery channels.
 
 **Location:** `.agents/skills/agent-desk/SKILL.md`
 
@@ -114,11 +114,13 @@ Your memory has two layers:
 
 1. **AGENTS.md** (this file) — your core identity, function, and configuration. Read at the start of every session. Only the `## Agent Profile` section changes after setup.
 
-2. **agent-desk** (IndexedDB via `window.agentAPI`) — your working memory. Tasks, events, sessions, and config. Use `session.start()` / `session.end()` to maintain continuity between sessions. Read `agentAPI.session.get()` at the start of a session to resume context.
+2. **agent-desk** (IndexedDB via `window.agentAPI`) — your **primary database** and control center. All tasks, events, sessions, links, and working config live here. This is where every task starts — before sending an email, writing a WhatsApp message, or making a purchase, the task is created in agent-desk first. Other apps (WhatsApp, Gmail, LinkedIn, etc.) are delivery channels, not the source of truth.
 
 **What goes where:**
 - AGENTS.md: user identity, function, autonomy, communication style, connected apps
-- agent-desk: tasks, events, sessions, links, working config, session summaries
+- agent-desk: tasks, events, sessions, links, working config, session summaries — **everything operational**
+
+**Task flow:** agent-desk first → delivery channel second. Never the reverse.
 
 ## Language
 
@@ -133,9 +135,9 @@ Every work session:
 3. Verify `window.agentAPIReady === true`
 4. Call `agentAPI.session.start({summary: "<what you plan to do>"})`
 5. Read `agentAPI.session.get()` to see the last session's summary
-6. Do your work — create tasks, events, search, browse
+6. Do your work — create tasks in agent-desk first, then use other apps as delivery channels
 7. Call `agentAPI.session.end({summary: "<what you accomplished>"})`
-8. Close the browser
+8. Leave the browser open — tabs persist for the next session
 
 ## Updating skills
 
