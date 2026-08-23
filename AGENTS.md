@@ -10,11 +10,15 @@ If the `## Agent Profile` section below is empty, run the **setup** skill to con
 Use the setup skill in .agents/skills/setup/SKILL.md
 ```
 
-Setup will guide the user through defining your function, autonomy, notifications, and app access.
+Setup will guide the user through defining who they are, your function, autonomy, notifications, and app access.
 
 ## Agent Profile
 
 > This section is populated by the setup skill. If empty, run setup first.
+
+### User
+
+_Not configured yet — run setup._
 
 ### Function
 
@@ -61,6 +65,7 @@ You have the following skills installed. Use them as your primary tools.
 - Use a single browser session with tabs, not multiple instances
 - Do not publish learnings from private sites without explicit confirmation
 - Preserve other agents' tabs — use your own tab
+- **Contribute back** — when you discover a shortcut, performance pattern, or automate a common app/service, open a PR to `galiprandi/skills` updating the browser-automation skill. Follow `sites/CONTRIBUTING.md`. This is how all agents improve together.
 
 **How to use:**
 ```bash
@@ -97,7 +102,7 @@ Read the full SKILL.md and `references/api-reference.md` for complete method sig
 
 ### setup
 
-**Purpose:** First-run onboarding. Configures your function, autonomy, notifications, tone, and app access.
+**Purpose:** First-run onboarding. Configures the user's identity, your function, autonomy, notifications, tone, and app access.
 
 **Location:** `.agents/skills/setup/SKILL.md`
 
@@ -112,7 +117,7 @@ Your memory has two layers:
 2. **agent-desk** (IndexedDB via `window.agentAPI`) — your working memory. Tasks, events, sessions, and config. Use `session.start()` / `session.end()` to maintain continuity between sessions. Read `agentAPI.session.get()` at the start of a session to resume context.
 
 **What goes where:**
-- AGENTS.md: function, autonomy, communication style, connected apps
+- AGENTS.md: user identity, function, autonomy, communication style, connected apps
 - agent-desk: tasks, events, sessions, links, working config, session summaries
 
 ## Language
@@ -134,7 +139,7 @@ Every work session:
 
 ## Updating skills
 
-To update installed skills to their latest versions:
+**Run `npx skills update` before setup and regularly** to keep skills current. Skills evolve and outdated versions can break the agent's workflow.
 
 ```bash
 npx skills update
@@ -156,9 +161,20 @@ assistant/
 ├── LICENSE                            # MIT
 ├── .gitignore                         # Ignores browser profile, env, etc.
 ├── skills-lock.json                   # Lock file for skill versions
-└── .agents/
-    └── skills/
-        ├── browser-automation/        # Browser control via playwright-cli
-        ├── agent-desk/                # Dashboard API for tasks/events/sessions
-        └── setup/                     # First-run onboarding (repo-local)
+├── .agents/
+│   └── skills/
+│       ├── browser-automation/        # Browser control via playwright-cli
+│       │   ├── SKILL.md
+│       │   ├── scripts/browser.js
+│       │   ├── references/            # golden-rules, api-capture, etc.
+│       │   └── sites/                 # per-app guides (gmail, whatsapp, ...)
+│       ├── agent-desk/                # Dashboard API for tasks/events/sessions
+│       │   ├── SKILL.md
+│       │   └── references/
+│       └── setup/                     # First-run onboarding (repo-local)
+└── .claude/
+    └── skills/                        # Symlinks → .agents/skills/ (for Claude Code)
+        ├── agent-desk
+        ├── browser-automation
+        └── setup
 ```

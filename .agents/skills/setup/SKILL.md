@@ -1,7 +1,7 @@
 ---
 name: setup
 version: "1.0.0"
-description: First-run onboarding skill. Guides the user through defining the agent's role, autonomy limits, notification channels, availability, tone/persona, and app access. Runs only once during initial setup.
+description: First-run onboarding skill. Guides the user through defining their identity, the agent's role, autonomy limits, notification channels, availability, tone/persona, and app access. Runs only once during initial setup.
 allowed-tools: Bash(*) Read(*) Write(*) Edit(*) Glob(*) Grep(*)
 metadata:
   author: galiprandi
@@ -17,11 +17,12 @@ This skill runs the **first time** a user opens the assistant repo. It guides an
 
 ## When to use
 
-- **Trigger:** `AGENTS.md` does not contain a `## Agent Profile` section (i.e., setup has not been run yet).
+- **Trigger:** The `## Agent Profile` section in `AGENTS.md` contains "_Not configured yet — run setup._" in any subsection (i.e., setup has not been run yet).
 - **Run once:** After setup completes, this skill should not run again unless the user explicitly requests reconfiguration.
 
 ## Prerequisites
 
+- **Skills up to date** — run `npx skills update` before starting setup to ensure the latest skill versions
 - `browser-automation` skill installed
 - `agent-desk` skill installed
 - agent-desk deployed and accessible (default: `https://galiprandi.github.io/agent-desk/`)
@@ -31,7 +32,15 @@ This skill runs the **first time** a user opens the assistant repo. It guides an
 
 Run each step in order. Ask the user one question at a time. Wait for their answer before proceeding. Keep the conversation in the user's language — detect it from their first message.
 
-### Step 1 — Core function
+### Step 1 — User identity
+
+Ask the user:
+
+> Who are you? Tell me a bit about yourself — name, what you do, and any context that helps me work better for you.
+
+Let the user describe freely. Capture at minimum: name, occupation/role, and any relevant context (industry, location, language preferences, working style). Save as `## Agent Profile → User` in `AGENTS.md`.
+
+### Step 2 — Core function
 
 Ask the user:
 
@@ -46,7 +55,7 @@ Examples to offer:
 
 Save the answer. This becomes the `## Agent Profile → Function` section in `AGENTS.md`.
 
-### Step 2 — Expectations
+### Step 3 — Expectations
 
 Ask:
 
@@ -54,7 +63,7 @@ Ask:
 
 Let the user describe freely. Summarize into 3-5 bullet points. Save as `## Agent Profile → Expectations` in `AGENTS.md`.
 
-### Step 3 — Autonomy limits
+### Step 4 — Autonomy limits
 
 Ask:
 
@@ -66,7 +75,7 @@ Offer defaults:
 
 Let the user customize. Save as `## Agent Profile → Autonomy` in `AGENTS.md`.
 
-### Step 4 — Notification channels
+### Step 5 — Notification channels
 
 Ask:
 
@@ -81,7 +90,7 @@ Options:
 
 Save as `## Agent Profile → Notifications` in `AGENTS.md`.
 
-### Step 5 — Availability
+### Step 6 — Availability
 
 Ask:
 
@@ -91,7 +100,7 @@ If active hours: ask for start/end times and timezone.
 
 Save as `## Agent Profile → Availability` in `AGENTS.md`.
 
-### Step 6 — Tone and persona
+### Step 7 — Tone and persona
 
 Ask:
 
@@ -114,9 +123,9 @@ If the user chooses "Mimic me":
    - Emoji usage (yes/no, which ones)
    - Greeting/sign-off style
 
-### Step 7 — App access
+### Step 8 — App access
 
-Based on the core function (Step 1) and notification channels (Step 4), determine which apps the agent needs access to. For each app:
+Based on the core function (Step 2) and notification channels (Step 5), determine which apps the agent needs access to. For each app:
 
 1. Tell the user: "I need access to [app name]. I'll open it in the browser — please log in."
 2. Use `browser-automation` to open the app URL in a new tab
@@ -130,14 +139,14 @@ Common apps by function:
 - Sales/CRM: Gmail, LinkedIn, WhatsApp
 - Research: Google, any specific databases
 
-### Step 8 — Browser homepage
+### Step 9 — Browser homepage
 
 1. Create the browser profile at `.browser-profile/` if it doesn't exist
 2. Set the homepage to the agent-desk URL
 3. Open the browser and verify agent-desk loads
 4. Verify `window.agentAPIReady === true`
 
-### Step 9 — Persist to agent-desk
+### Step 10 — Persist to agent-desk
 
 Using `agent-desk` skill (via `eval`):
 
@@ -146,28 +155,32 @@ Using `agent-desk` skill (via `eval`):
 agentAPI.session.start({summary: "Initial setup completed"})
 
 # Save config
-agentAPI.config.set("agentFunction", "<function from step 1>")
-agentAPI.config.set("agentExpectations", [<bullet points from step 2>])
+agentAPI.config.set("user", {name: "<name>", role: "<role>", context: "<context>"})
+agentAPI.config.set("agentFunction", "<function from step 2>")
+agentAPI.config.set("agentExpectations", [<bullet points from step 3>])
 agentAPI.config.set("agentAutonomy", {autonomous: [...], needsConfirmation: [...]})
-agentAPI.config.set("notificationChannels", [<channels from step 4>])
+agentAPI.config.set("notificationChannels", [<channels from step 5>])
 agentAPI.config.set("availability", {active: true/false, start: "...", end: "...", timezone: "..."})
-agentAPI.config.set("communicationStyle", {<profile from step 6>})
-agentAPI.config.set("connectedApps", [<apps from step 7>])
+agentAPI.config.set("communicationStyle", {<profile from step 7>})
+agentAPI.config.set("connectedApps", [<apps from step 8>])
 agentAPI.config.set("setupComplete", true)
 
 # Create setup tasks
 agentAPI.tasks.create({title: "Complete onboarding review", priority: "medium", tags: ["setup"]})
 ```
 
-### Step 10 — Persist to AGENTS.md
+### Step 11 — Persist to AGENTS.md
 
 Write the `## Agent Profile` section to `AGENTS.md` with all the collected information:
 
 ```markdown
 ## Agent Profile
 
+### User
+<name, role, context from step 1>
+
 ### Function
-<step 1 answer>
+<step 2 answer>
 
 ### Expectations
 - <bullet 1>
@@ -187,13 +200,56 @@ Write the `## Agent Profile` section to `AGENTS.md` with all the collected infor
 <active hours or 24/7>
 
 ### Communication Style
-<step 6 profile or "Own persona">
+<step 7 profile or "Own persona">
 
 ### Connected Apps
 - <app> — <login status>
 ```
 
-### Step 11 — Wrap up
+### Step 12 — Security validation
+
+Before finishing, verify that no personal data will leak to GitHub. This is critical — the user's profile, browser data, and credentials must never be pushed.
+
+**Check 1 — .gitignore covers sensitive paths:**
+
+Verify `.gitignore` includes at minimum:
+```
+.browser-profile/
+.playwright-cli/
+.playwright-mcp/
+.env
+.env.*
+*.state.json
+```
+
+If any are missing, add them.
+
+**Check 2 — AGENTS.md privacy decision:**
+
+After setup, `AGENTS.md` contains the user's identity, autonomy rules, connected apps, and communication style. If the repo is pushed to GitHub, all of that is public.
+
+Ask the user:
+
+> Your AGENTS.md will now contain your personal profile. If you push this repo to GitHub, that information will be public. How do you want to handle this?
+
+Options:
+- **Private repo** — keep AGENTS.md tracked, but make the GitHub repo private (recommended if they want version control of their profile)
+- **Ignore AGENTS.md** — add `AGENTS.md` to `.gitignore` so it stays local only. The template's `AGENTS.md` stays tracked, but the user's filled-in version is never committed. (Recommended for public repos)
+- **Accept** — the user understands and accepts that their profile will be public
+
+If "Ignore AGENTS.md": add `AGENTS.md` to `.gitignore` and run `git rm --cached AGENTS.md` if it's already tracked. The file stays on disk but won't be committed in future pushes. Note: previous commits in git history still contain the template version (without personal data), so no cleanup is needed.
+
+**Check 3 — No secrets staged:**
+
+Run `git status` and verify no sensitive files are staged:
+- No `.env`, `.env.*` files
+- No `.browser-profile/` contents
+- No `*.state.json` files
+- No files containing tokens, cookies, or credentials
+
+If any are found, remove them from staging and confirm they're gitignored.
+
+### Step 13 — Wrap up
 
 1. Tell the user setup is complete
 2. Summarize the configuration

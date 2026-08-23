@@ -1,7 +1,6 @@
 .browser-profile/
 .playwright-cli/
 .playwright-mcp/
-.pi-web/
 *.state.json
 .env
 .env.*

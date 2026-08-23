@@ -36,7 +36,7 @@ Agent-desk is a dashboard/homepage for AI agents. It persists everything in Inde
 - The **browser-automation** skill installed and its wrapper (`scripts/browser.js`) copied into the consuming repo's `scripts/` dir. Agent-desk is driven entirely through `eval` — you need the browser open and the wrapper working first.
 - The **agent-desk app deployed on GitHub Pages** at its public URL (e.g. `https://<owner>.github.io/<repo>/`). The app is a static SPA; no server is required.
 - A **persistent browser profile** with the agent-desk URL set as the homepage, so every `open` lands on the dashboard. See browser-automation's profile-management reference for setup.
-- Node.js 18+ and npm (for playwright-cli / the wrapper).
+- Node.js 22+ and npm (for playwright-cli / the wrapper).
 
 ## Setup
 
