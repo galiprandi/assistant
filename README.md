@@ -1,96 +1,155 @@
 # assistant
 
-A **template repository for creating AI agents**. Use this template, run setup, and your agent is ready to operate a browser, manage tasks, and maintain session continuity.
+A **self-contained AI agent** you control from Telegram. Launch it, configure your LLM provider, and chat with your agent from your phone — it runs a real browser, manages tasks, and maintains session continuity.
 
-> **[Use this template →](https://github.com/galiprandi/assistant/generate)** — creates a new repo under your account with all the files.
+Powered by [Pi](https://pi.dev) (agent runtime) + [Pigram](https://github.com/galiprandi/pigram) (Telegram bridge) + [Playwright](https://playwright.dev) (browser automation).
 
 ## What you get
 
-- **browser-automation** skill — control a browser via playwright-cli
-- **agent-desk** skill — dashboard with sync API for tasks, events, sessions, and config
-- **setup** skill — interactive first-run onboarding that configures the user's identity, the agent's role, autonomy, and integrations
-- **AGENTS.md** — the agent's identity file (read by all compatible agents)
-- **CLAUDE.md** — symlink to AGENTS.md (for Claude Code)
+- **Telegram control** — chat with your agent from anywhere via a Telegram bot
+- **Browser automation** — the agent operates a real Chromium browser (Gmail, WhatsApp, LinkedIn, and more)
+- **Task management** — built-in dashboard with tasks, events, sessions, and search (agent-desk)
+- **15+ LLM providers** — Anthropic, OpenAI, Google, Groq, OpenRouter, xAI, DeepSeek, and more
+- **Self-contained** — everything installs from this repo, no external services required
+- **Container-ready** — package it in Docker, deploy to Coolify, run multiple isolated agents
 
 ## Quick start
 
-### Option A — Use this template on GitHub
-
-1. Click **[Use this template](https://github.com/galiprandi/assistant/generate)** → name your repo (e.g. `my-agent`) → create
-2. Clone your new repo locally:
-   ```bash
-   git clone git@github.com:<your-user>/my-agent.git
-   cd my-agent
-   ```
-3. Restore skills from the lock file:
-   ```bash
-   npx skills experimental_install -y
-   ```
-4. Open the repo with your agent (Claude Code, Devin, Codex, Warp, etc.)
-
-### Option B — Clone directly
+### 1. Clone
 
 ```bash
-git clone git@github.com:galiprandi/assistant.git
+git clone --recurse-submodules git@github.com:galiprandi/assistant.git
 cd assistant
-npx skills experimental_install -y
 ```
 
-Then open with your agent.
+### 2. Configure
 
-### What happens next
+```bash
+./Assistant init
+```
 
-The agent will:
-1. Read `AGENTS.md` and detect that setup hasn't run yet
-2. Run `npx skills update` to ensure skills are current
-3. Ask you questions — who you are, what you want it to do, how autonomous it should be
-4. Configure itself based on your answers
-5. Set up the browser with agent-desk as homepage
-6. Save everything to AGENTS.md and agent-desk
-7. Run a security validation to ensure no personal data leaks to GitHub
+This asks for:
+- **Provider** — which LLM provider (anthropic, openai, google, etc.)
+- **Model** — which model ID (e.g. `claude-sonnet-4-5-20250929`)
+- **API key** — saved to `.env` (gitignored, never committed)
 
-## How it works
+It also installs pigram (the Telegram bridge) from the bundled fork.
+
+### 3. Create a Telegram bot
+
+1. Open [@BotFather](https://t.me/BotFather) in Telegram
+2. Send `/newbot`, pick a name and username
+3. Copy the bot token
+
+### 4. Launch
+
+```bash
+./Assistant
+```
+
+Pi launches with your configured provider and pigram loaded. Inside the Pi session, run:
 
 ```
-┌──────────────────────────────────────────────────────┐
-│  Agent (Claude, Devin, Codex, etc.)                  │
-│                                                      │
-│  Reads AGENTS.md → knows its identity & function     │
-│                                                      │
-│  ┌──────────────┐  ┌──────────────┐  ┌────────────┐ │
-│  │ browser-     │  │ agent-desk   │  │ setup      │ │
-│  │ automation   │  │ (control     │  │ (first-run │ │
-│  │ (browser)    │  │  center)     │  │  onboarding│ │
-│  └──────────────┘  └──────────────┘  └────────────┘ │
-│         │                 │                          │
-│         ▼                 ▼                          │
-│  ┌─────────────┐   ┌──────────────────┐             │
-│  │ Browser     │   │ agent-desk app   │             │
-│  │ (playwright │   │ (GitHub Pages)   │             │
-│  │  -cli)      │   │                  │             │
-│  │             │   │ window.agentAPI  │             │
-│  │  Tabs:      │   │  tasks           │             │
-│  │  - agent-   │   │  events          │             │
-│  │    desk     │   │  session         │             │
-│  │  - Gmail    │   │  links           │             │
-│  │  - WhatsApp │   │  config          │             │
-│  │  - etc.     │   │  search          │             │
-│  └─────────────┘   └──────────────────┘             │
-│                                                      │
-│  .browser-profile/ (gitignored, local)              │
-└──────────────────────────────────────────────────────┘
+/pigram-setup
+```
+
+Paste your Telegram bot token. Then open your bot in Telegram and send `/start` to pair your account.
+
+Done. Send any message to your bot and it's forwarded to the agent.
+
+## Commands
+
+```
+./Assistant init     Configure provider, model, and API key (saves to .env)
+./Assistant update   Pull latest repo + update skills + sync pigram from fork
+./Assistant          Launch pi with saved config and pigram loaded
+```
+
+## Architecture
+
+```
+┌─────────────────── Your machine / container ──────────────────┐
+│                                                                │
+│  ./Assistant                                                   │
+│     │                                                          │
+│     ▼                                                          │
+│  ┌──────────────────────────────────────────────────────────┐ │
+│  │  Pi (agent runtime)                                      │ │
+│  │                                                          │ │
+│  │  Reads AGENTS.md → knows its identity & function         │ │
+│  │                                                          │ │
+│  │  ┌──────────────┐  ┌──────────────┐  ┌────────────┐     │ │
+│  │  │ browser-     │  │ agent-desk   │  │ pigram     │     │ │
+│  │  │ automation   │  │ (task/event  │  │ (Telegram  │     │ │
+│  │  │ (browser)    │  │  dashboard)  │  │  bridge)   │     │ │
+│  │  └──────┬───────┘  └──────┬───────┘  └─────┬──────┘     │ │
+│  │         │                 │                 │            │ │
+│  │         ▼                 ▼                 ▼            │ │
+│  │  ┌─────────────┐  ┌──────────────┐  ┌──────────────┐    │ │
+│  │  │ Chromium    │  │ agent-desk   │  │ Telegram     │    │ │
+│  │  │ (Playwright │  │ (IndexedDB)  │  │ Bot API      │    │ │
+│  │  │  -cli)      │  │              │  │              │    │ │
+│  │  │             │  │ tasks        │  │ ← messages   │    │ │
+│  │  │ Tabs:       │  │ events       │  │ → replies    │    │ │
+│  │  │  Gmail      │  │ sessions     │  │              │    │ │
+│  │  │  WhatsApp   │  │ links        │  │              │    │ │
+│  │  │  LinkedIn   │  │ search       │  │              │    │ │
+│  │  │  etc.       │  │              │  │              │    │ │
+│  │  └─────────────┘  └──────────────┘  └──────────────┘    │ │
+│  └──────────────────────────────────────────────────────────┘ │
+│                                                                │
+│  .env                    ← provider + API key (gitignored)    │
+│  .browser-profile/       ← browser sessions (gitignored)     │
+│  .pi/                    ← pi config + pigram state (gitignored) │
+└────────────────────────────────────────────────────────────────┘
+         ↑                                          ↑
+         │                                          │
+    Your terminal                               Your phone
+                                              (Telegram app)
 ```
 
 ## Skills
 
 ### Installed from `galiprandi/skills`
 
-- **browser-automation** — browser control via playwright-cli (navigate, fill forms, read content)
-- **agent-desk** — dashboard API for task/event/session management
+- **browser-automation** — control a browser via playwright-cli (navigate, fill forms, read content, call internal site APIs)
+- **agent-desk** — dashboard with sync API for tasks, events, sessions, and config
 
 ### Repo-local
 
 - **setup** — first-run onboarding (not published, lives only in this repo)
+
+### Pigram (Telegram bridge)
+
+Installed from [`galiprandi/pigram`](https://github.com/galiprandi/pigram) (fork with bug fixes). Pigram bridges Telegram messages to Pi and back — you chat with your agent from your phone.
+
+Key pigram commands (inside a Pi session):
+- `/pigram-setup` — configure the Telegram bot token and start the bridge
+- `/pigram-connect` — reconnect the bridge using an existing config
+- `/pigram-disconnect` — stop the bridge
+- `/pigram-status` — show config, scope, paired user, and polling state
+- `/pigram-notify [on|off]` — forward terminal replies to Telegram (useful when working from the laptop)
+
+## Updating
+
+```bash
+./Assistant update
+```
+
+This pulls the latest changes from the repo, updates skills to their latest versions, and reinstalls pigram from the fork — all in one command.
+
+### Manual updates
+
+```bash
+# Update skills only
+npx skills update -y
+
+# Restore skills from lock file (after a fresh clone)
+npx skills experimental_install -y
+
+# Reinstall pigram from fork
+pi install git:github.com/galiprandi/pigram
+```
 
 ## Customization
 
@@ -108,19 +167,40 @@ npx skills add <github-owner>/<repo> --skill <skill-name> -y
 
 This updates `skills-lock.json` automatically.
 
-### Update skills
-
-```bash
-npx skills update
-```
-
 ### Reconfigure the agent
 
 Delete the `## Agent Profile` section content in `AGENTS.md` and restart. The agent will run setup again.
 
+### Change LLM provider or model
+
+```bash
+./Assistant init
+```
+
+Re-runs the config wizard and overwrites `.env`.
+
+## Container deployment
+
+Each agent runs as an isolated container with its own browser, its own data, and its own Telegram bot. Deploy to Coolify, Docker Compose, or any container platform.
+
+**What persists (mount as a volume):**
+- `.browser-profile/` — browser sessions (cookies, localStorage, IndexedDB)
+- `.pi/sessions/` — Pi session history (conversation tree)
+- `.pi/pigram.json` — pigram config (bot token)
+- `.pi/tmp/pigram/state.json` — pigram runtime state
+
+**What's configured via env vars:**
+- `PI_PROVIDER` — LLM provider
+- `PI_MODEL` — model ID
+- `<PROVIDER>_API_KEY` — API key (e.g. `ANTHROPIC_API_KEY`)
+
+Multiple agents = multiple containers, same image, different env vars and volumes. No collision.
+
 ## Data and privacy
 
-- **Browser profile** (`.browser-profile/`) is gitignored — never committed
+- **`.env`** — provider config and API key, gitignored, never committed
+- **`.browser-profile/`** — browser sessions, gitignored
+- **`.pi/`** — Pi config, pigram token, session history, gitignored
 - **agent-desk data** lives in IndexedDB, scoped to the browser profile
 - **No backend** — everything is local or static
 - **No telemetry** — the agent doesn't phone home
@@ -131,8 +211,38 @@ Delete the `## Agent Profile` section content in `AGENTS.md` and restart. The ag
 
 - Node.js 22+
 - npx (comes with Node)
-- A compatible AI agent (Claude Code, Devin, Codex, Warp, etc.)
-- playwright-cli (installed by browser-automation skill)
+- A Telegram bot token (from [@BotFather](https://t.me/BotFather))
+- An LLM API key (Anthropic, OpenAI, Google, etc.)
+- playwright-cli (installed by browser-automation skill on first browser use)
+
+## Repo structure
+
+```
+assistant/
+├── Assistant                   # Launcher script (init, update, run)
+├── AGENTS.md                   # Agent identity & config (read by Pi)
+├── CLAUDE.md                   # Symlink → AGENTS.md (for Claude Code)
+├── README.md                   # This file
+├── LICENSE                     # MIT
+├── .gitignore                  # Ignores .env, .browser-profile/, .pi/, etc.
+├── skills-lock.json            # Lock file for skill versions
+├── package.json                # Pi dependency
+├── .gitmodules                 # Pigram submodule reference
+├── pigram/                     # Pigram source (git submodule, for reference)
+├── .agents/
+│   └── skills/
+│       ├── browser-automation/ # Browser control via playwright-cli
+│       │   ├── SKILL.md
+│       │   ├── scripts/browser.js
+│       │   ├── references/     # golden-rules, api-capture, etc.
+│       │   └── sites/          # per-app guides (gmail, whatsapp, ...)
+│       ├── agent-desk/         # Dashboard API for tasks/events/sessions
+│       │   ├── SKILL.md
+│       │   └── references/
+│       └── setup/              # First-run onboarding (repo-local)
+└── .claude/
+    └── skills/                 # Symlinks → .agents/skills/ (for Claude Code)
+```
 
 ## License
 
