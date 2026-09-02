@@ -36,11 +36,21 @@ init_submodules() {
   fi
 }
 
-# --- Install/reinstall pigram from fork ---
+# --- Install/reinstall pigram from fork (remove npm version first if present) ---
 ensure_pigram() {
-  info "Installing pigram from fork ($PIGRAM_PKG)..."
-  PI_CODING_AGENT_DIR="$PI_DIR" npx --yes "$PI_PKG" install "$PIGRAM_PKG"
-  ok "pigram installed."
+  # Remove npm version if installed — avoids loading the buggy upstream
+  if grep -q "npm:@jetmiky/pigram" "$PI_DIR/settings.json" 2>/dev/null; then
+    info "Removing npm pigram (replacing with fork)..."
+    PI_CODING_AGENT_DIR="$PI_DIR" npx --yes "$PI_PKG" remove "npm:@jetmiky/pigram" 2>/dev/null || true
+  fi
+  # Install from fork if not already installed
+  if ! grep -q "git:github.com/galiprandi/pigram" "$PI_DIR/settings.json" 2>/dev/null; then
+    info "Installing pigram from fork ($PIGRAM_PKG)..."
+    PI_CODING_AGENT_DIR="$PI_DIR" npx --yes "$PI_PKG" install "$PIGRAM_PKG"
+    ok "pigram installed."
+  else
+    ok "pigram already installed from fork."
+  fi
 }
 
 # --- Load .env ---
@@ -97,6 +107,9 @@ cmd_init() {
 
 # --- Update: pull repo + update skills + sync pigram ---
 cmd_update() {
+  local resourced=false
+  [[ "${2:-}" == "--resourced" ]] && resourced=true
+
   # Refuse if there are uncommitted changes
   if ! git diff --quiet || ! git diff --staged --quiet; then
     warn "Uncommitted changes detected. Commit or stash before updating:"
@@ -104,35 +117,42 @@ cmd_update() {
     exit 1
   fi
 
-  # Determine which remote to pull from (prefer upstream for forks)
-  local remote="origin"
-  if git remote get-url upstream &>/dev/null; then
-    remote="upstream"
-  fi
-  local branch
-  branch=$(git rev-parse --abbrev-ref HEAD)
+  if [[ "$resourced" == false ]]; then
+    # Determine which remote to pull from (prefer upstream for forks)
+    local remote="origin"
+    if git remote get-url upstream &>/dev/null; then
+      remote="upstream"
+    fi
+    local branch
+    branch=$(git rev-parse --abbrev-ref HEAD)
 
-  info "Fetching from $remote..."
-  git fetch "$remote" "$branch" 2>/dev/null
+    info "Fetching from $remote..."
+    git fetch "$remote" "$branch" 2>/dev/null
 
-  local local_ref remote_ref
-  local_ref=$(git rev-parse HEAD)
-  remote_ref=$(git rev-parse "$remote/$branch" 2>/dev/null || echo "")
+    local local_ref remote_ref
+    local_ref=$(git rev-parse HEAD)
+    remote_ref=$(git rev-parse "$remote/$branch" 2>/dev/null || echo "")
 
-  if [[ -z "$remote_ref" ]]; then
-    error "No remote branch $remote/$branch found."
-    exit 1
-  fi
+    if [[ -z "$remote_ref" ]]; then
+      error "No remote branch $remote/$branch found."
+      exit 1
+    fi
 
-  if [[ "$local_ref" == "$remote_ref" ]]; then
-    ok "Already up to date ($branch @ ${local_ref:0:7})"
+    if [[ "$local_ref" == "$remote_ref" ]]; then
+      ok "Already up to date ($branch @ ${local_ref:0:7})"
+    else
+      local behind
+      behind=$(git rev-list --count HEAD.."$remote/$branch")
+      info "↓  $behind commit(s) behind $remote/$branch"
+      info "Pulling..."
+      git pull "$remote" "$branch" --ff-only
+      ok "Pulled latest."
+      # Re-exec this script in case it was updated by the pull
+      # (PI_VERSION, pigram fork URL, etc. apply on this run)
+      exec "$0" update --resourced
+    fi
   else
-    local behind
-    behind=$(git rev-list --count HEAD.."$remote/$branch")
-    info "↓  $behind commit(s) behind $remote/$branch"
-    info "Pulling..."
-    git pull "$remote" "$branch" --ff-only
-    ok "Pulled latest."
+    ok "Script updated — continuing with new version."
   fi
 
   # Update skills
@@ -146,9 +166,20 @@ cmd_update() {
     npx skills experimental_install -y
   fi
 
-  # Sync pigram from fork
+  # Sync pigram from fork (always reinstall to pick up fixes)
   echo ""
-  ensure_pigram
+  info "Syncing pigram from fork..."
+  # Remove npm version if present
+  if grep -q "npm:@jetmiky/pigram" "$PI_DIR/settings.json" 2>/dev/null; then
+    info "Removing npm pigram (replacing with fork)..."
+    PI_CODING_AGENT_DIR="$PI_DIR" npx --yes "$PI_PKG" remove "npm:@jetmiky/pigram" 2>/dev/null || true
+  fi
+  # Remove fork version so reinstall pulls latest
+  if grep -q "git:github.com/galiprandi/pigram" "$PI_DIR/settings.json" 2>/dev/null; then
+    PI_CODING_AGENT_DIR="$PI_DIR" npx --yes "$PI_PKG" remove "git:github.com/galiprandi/pigram" 2>/dev/null || true
+  fi
+  PI_CODING_AGENT_DIR="$PI_DIR" npx --yes "$PI_PKG" install "$PIGRAM_PKG"
+  ok "pigram synced from fork."
 
   echo ""
   ok "Update complete ($(git rev-parse --short HEAD))"
@@ -175,7 +206,7 @@ cmd_run() {
 # --- Dispatch ---
 case "${1:-}" in
   init)   cmd_init ;;
-  update) cmd_update ;;
+  update) cmd_update "$@" ;;
   "")     cmd_run ;;
   *)
     error "Unknown command: $1"
