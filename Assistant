@@ -5,6 +5,7 @@ set -euo pipefail
 #
 # Usage:
 #   ./Assistant init   — ask for provider/model/api-key, save to .env (overwrites)
+#   ./Assistant update — update this script + skills + pigram from template repo
 #   ./Assistant        — launch pi with saved .env (fails if missing)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -13,6 +14,8 @@ cd "$SCRIPT_DIR"
 PI_VERSION="0.84.4"
 PI_PKG="@earendil-works/pi-coding-agent@${PI_VERSION}"
 PIGRAM_PKG="git:github.com/galiprandi/pigram"
+TEMPLATE_REPO="galiprandi/assistant"
+TEMPLATE_RAW="https://raw.githubusercontent.com/${TEMPLATE_REPO}/main/Assistant"
 ENV_FILE="$SCRIPT_DIR/.env"
 PI_DIR="$SCRIPT_DIR/.pi"
 
@@ -105,61 +108,41 @@ cmd_init() {
   ok "Saved to $ENV_FILE"
 }
 
-# --- Update: pull repo + update skills + sync pigram ---
+# --- Update: download latest Assistant script + update skills + sync pigram ---
+# This works for template-based repos (no shared git history with the template).
+# Only downloads the Assistant script itself — your AGENTS.md, .env, and other
+# files are never touched.
 cmd_update() {
   local resourced=false
   [[ "${2:-}" == "--resourced" ]] && resourced=true
 
-  # Refuse if there are uncommitted changes
-  if ! git diff --quiet || ! git diff --staged --quiet; then
-    warn "Uncommitted changes detected. Commit or stash before updating:"
-    git status --short
-    exit 1
-  fi
-
+  # 1. Download latest Assistant script from template repo
   if [[ "$resourced" == false ]]; then
-    # Determine which remote to pull from (prefer upstream for forks)
-    local remote="origin"
-    if git remote get-url upstream &>/dev/null; then
-      remote="upstream"
-    fi
-    local branch
-    branch=$(git rev-parse --abbrev-ref HEAD)
-
-    info "Fetching from $remote..."
-    git fetch "$remote" "$branch" 2>/dev/null
-
-    local local_ref remote_ref
-    local_ref=$(git rev-parse HEAD)
-    remote_ref=$(git rev-parse "$remote/$branch" 2>/dev/null || echo "")
-
-    if [[ -z "$remote_ref" ]]; then
-      error "No remote branch $remote/$branch found."
-      exit 1
-    fi
-
-    if [[ "$local_ref" == "$remote_ref" ]]; then
-      ok "Already up to date ($branch @ ${local_ref:0:7})"
+    info "Downloading latest Assistant script from $TEMPLATE_REPO..."
+    local tmp_script
+    tmp_script=$(mktemp)
+    if curl -fsSL "$TEMPLATE_RAW" -o "$tmp_script"; then
+      # Check if it's actually different
+      if ! diff -q "$tmp_script" "$SCRIPT_DIR/Assistant" &>/dev/null; then
+        cp "$tmp_script" "$SCRIPT_DIR/Assistant"
+        chmod +x "$SCRIPT_DIR/Assistant"
+        ok "Assistant script updated."
+        rm -f "$tmp_script"
+        # Re-exec with the new script so PI_VERSION etc. apply now
+        exec "$0" update --resourced
+      else
+        ok "Assistant script already up to date."
+        rm -f "$tmp_script"
+      fi
     else
-      local behind
-      behind=$(git rev-list --count HEAD.."$remote/$branch")
-      info "↓  $behind commit(s) behind $remote/$branch"
-      info "Pulling..."
-      git pull "$remote" "$branch" --ff-only
-      ok "Pulled latest."
-      # Re-exec this script in case it was updated by the pull
-      # (PI_VERSION, pigram fork URL, etc. apply on this run)
-      exec "$0" update --resourced
+      rm -f "$tmp_script"
+      warn "Could not download latest script — continuing with current version."
     fi
   else
-    ok "Script updated — continuing with new version."
+    ok "Running updated script."
   fi
 
-  # Pre-fetch Pi version (ensures npx has the new version cached)
-  info "Ensuring Pi $PI_VERSION is available..."
-  npx --yes "$PI_PKG" --version 2>/dev/null || true
-
-  # Update skills
+  # 2. Update skills
   echo ""
   info "Updating skills..."
   npx skills update -y
@@ -170,7 +153,7 @@ cmd_update() {
     npx skills experimental_install -y
   fi
 
-  # Sync pigram from fork (always reinstall to pick up fixes)
+  # 3. Sync pigram from fork (always reinstall to pick up fixes)
   echo ""
   info "Syncing pigram from fork..."
   # Remove npm version if present
@@ -186,7 +169,7 @@ cmd_update() {
   ok "pigram synced from fork."
 
   echo ""
-  ok "Update complete ($(git rev-parse --short HEAD))"
+  ok "Update complete."
 }
 
 # --- Launch pi with saved config ---
