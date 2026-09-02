@@ -7,3 +7,8 @@
 node_modules/
 .DS_Store
 *.log
+# pi local config (pigram token, state, etc.)
+.pi/
+# pigram local secrets/cache
+.pi/pigram.json
+.pi/tmp/

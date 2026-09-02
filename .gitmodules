@@ -1,0 +1,3 @@
+[submodule "pigram"]
+	path = pigram
+	url = https://github.com/galiprandi/pigram.git
