@@ -155,6 +155,10 @@ cmd_update() {
     ok "Script updated — continuing with new version."
   fi
 
+  # Pre-fetch Pi version (ensures npx has the new version cached)
+  info "Ensuring Pi $PI_VERSION is available..."
+  npx --yes "$PI_PKG" --version 2>/dev/null || true
+
   # Update skills
   echo ""
   info "Updating skills..."
