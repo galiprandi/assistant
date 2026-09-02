@@ -10,7 +10,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-PI_VERSION="0.84.2"
+PI_VERSION="0.84.4"
 PI_PKG="@earendil-works/pi-coding-agent@${PI_VERSION}"
 PIGRAM_PKG="git:github.com/galiprandi/pigram"
 ENV_FILE="$SCRIPT_DIR/.env"
