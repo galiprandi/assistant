@@ -185,7 +185,13 @@ cmd_update() {
     fi
   fi
 
-  # 2. Update skills
+  # 2. Ensure Pi version is available (forces npx to download new version)
+  echo ""
+  info "Ensuring Pi $PI_VERSION is available..."
+  npx --yes "$PI_PKG" --version >/dev/null 2>&1 || true
+  ok "Pi $PI_VERSION ready."
+
+  # 3. Update skills
   echo ""
   info "Updating skills..."
   npx skills update -y
@@ -196,7 +202,7 @@ cmd_update() {
     npx skills experimental_install -y
   fi
 
-  # 3. Sync pigram from fork (always reinstall to pick up fixes)
+  # 4. Sync pigram from fork (always reinstall to pick up fixes)
   echo ""
   info "Syncing pigram from fork..."
   # Remove npm version if present
