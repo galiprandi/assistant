@@ -169,7 +169,9 @@ This updates `skills-lock.json` automatically.
 
 ### Reconfigure the agent
 
-Delete the `## Agent Profile` section content in `AGENTS.md` and restart. The agent will run setup again.
+Edit your `AGENTS.md` (gitignored, personal copy). The template is `AGENTS.example.md` — when it updates, `./Assistant update` warns you to review the "## Novedades" section and copy what you want.
+
+To start fresh: delete `AGENTS.md` and run `./Assistant init` (recreates it from the template).
 
 ### Change LLM provider or model
 
@@ -199,6 +201,7 @@ Multiple agents = multiple containers, same image, different env vars and volume
 ## Data and privacy
 
 - **`.env`** — provider config and API key, gitignored, never committed
+- **`AGENTS.md`** — your personal agent config, gitignored (template is `AGENTS.example.md`)
 - **`.browser-profile/`** — browser sessions, gitignored
 - **`.pi/`** — Pi config, pigram token, session history, gitignored
 - **agent-desk data** lives in IndexedDB, scoped to the browser profile
@@ -220,7 +223,8 @@ Multiple agents = multiple containers, same image, different env vars and volume
 ```
 assistant/
 ├── Assistant                   # Launcher script (init, update, run)
-├── AGENTS.md                   # Agent identity & config (read by Pi)
+├── AGENTS.example.md           # Agent identity template (trackeado, se actualiza)
+├── AGENTS.md                   # Tu config personal (gitignored, copia del example)
 ├── CLAUDE.md                   # Symlink → AGENTS.md (for Claude Code)
 ├── README.md                   # This file
 ├── LICENSE                     # MIT

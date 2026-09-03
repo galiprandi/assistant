@@ -15,7 +15,7 @@ PI_VERSION="0.84.4"
 PI_PKG="@earendil-works/pi-coding-agent@${PI_VERSION}"
 PIGRAM_PKG="git:github.com/galiprandi/pigram"
 TEMPLATE_REPO="galiprandi/assistant"
-TEMPLATE_RAW="https://raw.githubusercontent.com/${TEMPLATE_REPO}/main/Assistant"
+TEMPLATE_RAW="https://raw.githubusercontent.com/${TEMPLATE_REPO}/main"
 ENV_FILE="$SCRIPT_DIR/.env"
 PI_DIR="$SCRIPT_DIR/.pi"
 
@@ -72,6 +72,12 @@ cmd_init() {
   init_submodules
   ensure_pigram
 
+  # Copy AGENTS.example.md → AGENTS.md if not present
+  if [ ! -f "$SCRIPT_DIR/AGENTS.md" ] && [ -f "$SCRIPT_DIR/AGENTS.example.md" ]; then
+    cp "$SCRIPT_DIR/AGENTS.example.md" "$SCRIPT_DIR/AGENTS.md"
+    ok "Created AGENTS.md from template (AGENTS.example.md)."
+  fi
+
   echo ""
   if [ -f "$ENV_FILE" ]; then
     warn "Existing .env found — overwriting."
@@ -116,30 +122,67 @@ cmd_update() {
   local resourced=false
   [[ "${2:-}" == "--resourced" ]] && resourced=true
 
-  # 1. Download latest Assistant script from template repo
+  # 1. Download latest files from template repo
   if [[ "$resourced" == false ]]; then
-    info "Downloading latest Assistant script from $TEMPLATE_REPO..."
+    local changed=false
+
+    # Download Assistant script
+    info "Checking for Assistant script updates..."
     local tmp_script
     tmp_script=$(mktemp)
-    if curl -fsSL "$TEMPLATE_RAW" -o "$tmp_script"; then
-      # Check if it's actually different
+    if curl -fsSL "$TEMPLATE_RAW/Assistant" -o "$tmp_script"; then
       if ! diff -q "$tmp_script" "$SCRIPT_DIR/Assistant" &>/dev/null; then
         cp "$tmp_script" "$SCRIPT_DIR/Assistant"
         chmod +x "$SCRIPT_DIR/Assistant"
         ok "Assistant script updated."
-        rm -f "$tmp_script"
-        # Re-exec with the new script so PI_VERSION etc. apply now
-        exec "$0" update --resourced
+        changed=true
       else
         ok "Assistant script already up to date."
-        rm -f "$tmp_script"
       fi
     else
-      rm -f "$tmp_script"
-      warn "Could not download latest script — continuing with current version."
+      warn "Could not download Assistant script — continuing with current version."
+    fi
+    rm -f "$tmp_script"
+
+    # Download AGENTS.example.md
+    info "Checking for AGENTS.example.md updates..."
+    local tmp_example
+    tmp_example=$(mktemp)
+    if curl -fsSL "$TEMPLATE_RAW/AGENTS.example.md" -o "$tmp_example"; then
+      if ! diff -q "$tmp_example" "$SCRIPT_DIR/AGENTS.example.md" &>/dev/null 2>&1; then
+        cp "$tmp_example" "$SCRIPT_DIR/AGENTS.example.md"
+        ok "AGENTS.example.md updated."
+        changed=true
+      else
+        ok "AGENTS.example.md already up to date."
+      fi
+    else
+      warn "Could not download AGENTS.example.md — continuing with current version."
+    fi
+    rm -f "$tmp_example"
+
+    # Re-exec if the script changed so new PI_VERSION etc. apply now
+    if [[ "$changed" == true ]]; then
+      exec "$0" update --resourced
     fi
   else
     ok "Running updated script."
+  fi
+
+  # Check if AGENTS.example.md changed (user should review)
+  if [ -f "$SCRIPT_DIR/AGENTS.example.md" ] && [ -f "$SCRIPT_DIR/AGENTS.md" ]; then
+    local example_hash_file="$PI_DIR/.agents-example.sha256"
+    local current_hash
+    current_hash=$(sha256sum "$SCRIPT_DIR/AGENTS.example.md" | cut -d' ' -f1)
+    local saved_hash=""
+    [ -f "$example_hash_file" ] && saved_hash=$(cat "$example_hash_file")
+    if [[ "$current_hash" != "$saved_hash" ]]; then
+      echo ""
+      warn "AGENTS.example.md has been updated."
+      warn "Review the '## Novedades' section and copy what you want to AGENTS.md."
+      mkdir -p "$PI_DIR"
+      echo "$current_hash" > "$example_hash_file"
+    fi
   fi
 
   # 2. Update skills

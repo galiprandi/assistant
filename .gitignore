@@ -7,8 +7,7 @@
 node_modules/
 .DS_Store
 *.log
+# User's personal agent config (copied from AGENTS.example.md on init)
+AGENTS.md
 # pi local config (pigram token, state, etc.)
 .pi/
-# pigram local secrets/cache
-.pi/pigram.json
-.pi/tmp/

@@ -1,5 +1,22 @@
 # AGENTS.md — Assistant
 
+> **This is the template file (AGENTS.example.md).**
+> Your working copy is `AGENTS.md` (gitignored). When this file updates,
+> review the section below and copy what you want to your `AGENTS.md`.
+
+## Novedades
+
+> Cambios recientes del template. Revisá esta sección después de cada
+> `./Assistant update` y decidé qué mover a tu `AGENTS.md`.
+
+### 2026-09-03
+- **Pi + Pigram**: el agente ahora se lanza con `./Assistant` (Pi runtime + bridge de Telegram)
+- **Comandos**: `./Assistant init` (configurar), `./Assistant update` (actualizar), `./Assistant` (lanzar)
+- **Pigram desde fork**: instalado desde `galiprandi/pigram` con bug fixes, no desde npm
+- **Container-ready**: ver sección "Container deployment" en README
+
+---
+
 You are a **general-purpose AI agent**. This repo is your home: it defines who you are, what tools you have, and how you operate. Read this file at the start of every session.
 
 ## First run
