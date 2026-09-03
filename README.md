@@ -4,6 +4,20 @@ A **self-contained AI agent** you control from Telegram. Launch it, configure yo
 
 Powered by [Pi](https://pi.dev) (agent runtime) + [Pigram](https://github.com/galiprandi/pigram) (Telegram bridge) + [Playwright](https://playwright.dev) (browser automation).
 
+## Create a new agent
+
+Fork this repo on GitHub (top-right **Fork** button), then clone it with the name you want:
+
+```bash
+git clone --recurse-submodules git@github.com:<your-user>/assistant.git my-bot-name
+cd my-bot-name
+./Assistant init
+```
+
+`./Assistant init` asks for your LLM provider, model, and API key, then installs pigram and creates your `AGENTS.md` from the template.
+
+> You can clone as many times as you want with different names — each one is a separate agent with its own browser, its own Telegram bot, and its own data. No collision.
+
 ## What you get
 
 - **Telegram control** — chat with your agent from anywhere via a Telegram bot
@@ -13,35 +27,13 @@ Powered by [Pi](https://pi.dev) (agent runtime) + [Pigram](https://github.com/ga
 - **Self-contained** — everything installs from this repo, no external services required
 - **Container-ready** — package it in Docker, deploy to Coolify, run multiple isolated agents
 
-## Quick start
-
-### 1. Clone
-
-```bash
-git clone --recurse-submodules git@github.com:galiprandi/assistant.git
-cd assistant
-```
-
-### 2. Configure
-
-```bash
-./Assistant init
-```
-
-This asks for:
-- **Provider** — which LLM provider (anthropic, openai, google, etc.)
-- **Model** — which model ID (e.g. `claude-sonnet-4-5-20250929`)
-- **API key** — saved to `.env` (gitignored, never committed)
-
-It also installs pigram (the Telegram bridge) from the bundled fork.
-
-### 3. Create a Telegram bot
+## Connect to Telegram
 
 1. Open [@BotFather](https://t.me/BotFather) in Telegram
 2. Send `/newbot`, pick a name and username
 3. Copy the bot token
 
-### 4. Launch
+## Launch
 
 ```bash
 ./Assistant
@@ -61,7 +53,7 @@ Done. Send any message to your bot and it's forwarded to the agent.
 
 ```
 ./Assistant init     Configure provider, model, and API key (saves to .env)
-./Assistant update   Pull latest repo + update skills + sync pigram from fork
+./Assistant update   Update script + AGENTS.example.md + skills + pigram from template
 ./Assistant          Launch pi with saved config and pigram loaded
 ```
 
