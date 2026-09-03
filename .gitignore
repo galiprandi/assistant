@@ -7,6 +7,9 @@
 node_modules/
 .DS_Store
 *.log
+# VitePress build output
+docs/.vitepress/dist/
+docs/.vitepress/cache/
 # User's personal agent config (copied from AGENTS.example.md on init)
 AGENTS.md
 # pi local config (pigram token, state, etc.)
