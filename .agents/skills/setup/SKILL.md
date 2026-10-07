@@ -285,6 +285,9 @@ If yes, the agent drives the whole flow — the user does nothing but log in:
   // Per-instance values — MUST be correct when several agents share a machine:
   "agentCmd": "<detected ACP command, e.g. 'devin acp --model swe-2'>",
   "agentCwd": "<absolute path of THIS agent's folder>",  // never another agent's
+  // REQUIRED — never omit: a stable sessionId makes acp-connector resume the
+  // same agent session, so the agent keeps its context across restarts and
+  // messages. Without it every message could start a fresh, amnesic session.
   "sessionId": "<unique slug for this agent, e.g. its name>",
 
   "platforms": {
@@ -315,7 +318,9 @@ If yes, the agent drives the whole flow — the user does nothing but log in:
 
 Per-instance checklist (multi-agent machines):
 - `agentCwd` = this folder — the bridge must spawn the agent in its own home
-- `sessionId` unique per agent (use the agent's name)
+- `sessionId` **must be set** and unique per agent (use the agent's name) —
+  it's what preserves conversation context across restarts; two agents must
+  never share it
 - `http.enabled` defaults to `false`; if enabled, pick a port not used by
   other agents on the machine (check their `acp-connector.jsonc`)
 - `media.uploadsDir` inside this folder
