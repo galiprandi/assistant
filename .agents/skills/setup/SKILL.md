@@ -300,22 +300,24 @@ If yes, the agent drives the whole flow — the user does nothing but log in:
   "streaming": true,
   "logLevel": "info",
 
-  "http": { "enabled": true, "port": <unique port per agent, e.g. 7780+n> },
+  // HTTP API: opt-in — enable only if the user asks for external integrations.
+  // When enabled, port must be unique per agent on the machine (7780+n).
+  "http": { "enabled": false },
   "media": { "uploadsDir": "<abs path>/uploads" },   // create the dir; gitignored
 
   "cron": [],
-  "routines": [
-    // named reusable prompts, e.g.:
-    // { "name": "ws", "prompt": "Check WhatsApp for new messages, summarize them and prepare numbered draft replies so I can decide which to send" }
-  ]
+  "routines": []
+  // routines are named reusable prompts — start empty; the agent proposes
+  // a few based on the chosen role at the end of setup (see step 15), e.g.:
+  // { "name": "ws", "prompt": "Check WhatsApp for new messages, summarize them and prepare numbered draft replies so I can decide which to send" }
 }
 ```
 
 Per-instance checklist (multi-agent machines):
 - `agentCwd` = this folder — the bridge must spawn the agent in its own home
 - `sessionId` unique per agent (use the agent's name)
-- `http.port` unique per agent (7780, 7781, ... — check Donna/other agents'
-  configs on the machine to avoid collisions)
+- `http.enabled` defaults to `false`; if enabled, pick a port not used by
+  other agents on the machine (check their `acp-connector.jsonc`)
 - `media.uploadsDir` inside this folder
 - `allowedChatIds`/`allowedChannelIds` = the owner's only — never open
 
@@ -348,10 +350,14 @@ it to them exactly. Manage later with `npm run daemon:logs` and
 
 1. Tell the user setup is complete
 2. Summarize the configuration
-3. If connect/daemon were skipped, note they can enable them any time by
+3. If connect was configured, propose 2-3 **routines** tailored to the
+   agent's role (e.g. a WhatsApp digest for a personal assistant, a
+   deadline check for a taxes agent) — add them to `routines` in
+   `acp-connector.jsonc` only with the user's approval
+4. If connect/daemon were skipped, note they can enable them any time by
    just asking
-4. End the session: `agentAPI.session.end({summary: "Setup complete. Agent configured for <function>."})`
-5. Ask if they want to start using the agent now
+5. End the session: `agentAPI.session.end({summary: "Setup complete. Agent configured for <function>."})`
+6. Ask if they want to start using the agent now
 
 ## Golden rules
 
