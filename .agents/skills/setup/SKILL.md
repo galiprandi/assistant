@@ -270,10 +270,56 @@ If yes, the agent drives the whole flow — the user does nothing but log in:
    one (or configure it to accept DMs).
 3. Ask which agent command to bridge (detect installed CLIs: `devin acp`,
    `claude`, `opencode`, `codex`, `gemini`, ...).
-4. Write `acp-connector.jsonc` (gitignored) with the collected tokens and
-   agent command — or run `npm run connect:setup` if the wizard is easier
-   to drive from the terminal.
-5. Test it: `npm run connect` in the background, send a test message to
+4. Collect the **allowed chat/channel IDs**: send a message to the new bot
+   from the user's account, then fetch `getUpdates` with the token
+   (Telegram) or read the channel ID from Discord (user enables Developer
+   Mode → right-click channel → Copy Channel ID).
+5. Write `acp-connector.jsonc` (gitignored) with the collected values and
+   the recommended defaults below — don't rely on the wizard alone, it
+   doesn't cover the important options.
+
+**Recommended config template** (adjust names, never leave placeholders):
+
+```jsonc
+{
+  // Per-instance values — MUST be correct when several agents share a machine:
+  "agentCmd": "<detected ACP command, e.g. 'devin acp --model swe-2'>",
+  "agentCwd": "<absolute path of THIS agent's folder>",  // never another agent's
+  "sessionId": "<unique slug for this agent, e.g. its name>",
+
+  "platforms": {
+    "telegram": { "token": "<bot token>", "allowedChatIds": [<owner chat id>] },
+    "discord":  { "token": "<bot token>", "allowedChannelIds": ["<channel id>"] }
+    // omit a platform block if not configured
+  },
+
+  // UX defaults — recommended, quiet & mobile-friendly:
+  "showThoughts": false,
+  "showTools": false,
+  "showPlan": false,
+  "streaming": true,
+  "logLevel": "info",
+
+  "http": { "enabled": true, "port": <unique port per agent, e.g. 7780+n> },
+  "media": { "uploadsDir": "<abs path>/uploads" },   // create the dir; gitignored
+
+  "cron": [],
+  "routines": [
+    // named reusable prompts, e.g.:
+    // { "name": "ws", "prompt": "Check WhatsApp for new messages, summarize them and prepare numbered draft replies so I can decide which to send" }
+  ]
+}
+```
+
+Per-instance checklist (multi-agent machines):
+- `agentCwd` = this folder — the bridge must spawn the agent in its own home
+- `sessionId` unique per agent (use the agent's name)
+- `http.port` unique per agent (7780, 7781, ... — check Donna/other agents'
+  configs on the machine to avoid collisions)
+- `media.uploadsDir` inside this folder
+- `allowedChatIds`/`allowedChannelIds` = the owner's only — never open
+
+6. Test it: `npm run connect` in the background, send a test message to
    the bot, confirm a reply arrives, then stop it (or keep running if the
    user enables always-on next).
 
