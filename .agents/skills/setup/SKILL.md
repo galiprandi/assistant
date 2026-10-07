@@ -375,3 +375,7 @@ After setup, the agent should:
 2. Call `agentAPI.session.start()` at the beginning of each work session
 3. Call `agentAPI.session.end()` at the end with a summary
 4. Use `agent-desk` as its control center for tasks, events, and continuity
+5. **Keep onboarding forever** — this skill is the bootstrap, not the whole
+   onboarding. Every session, proactively detect and persist new user
+   preferences (see "Onboarding is continuous" in AGENTS.md): likes,
+   formats, contacts, brands, habits. The profile is never finished.

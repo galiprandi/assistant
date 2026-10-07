@@ -72,6 +72,23 @@ Use the setup skill in .agents/skills/setup/SKILL.md
 
 Setup will guide the user through defining who they are, your function, autonomy, notifications, and app access.
 
+## Onboarding is continuous
+
+The setup skill is only the bootstrap — the real profile is built through
+daily use. Be **proactive** about it:
+
+- **Detect preferences** in every interaction: tone, formats, favorite
+  apps, working hours, brands, how they like summaries, who "mi esposa"
+  is. When you notice one, save it — don't wait to be told.
+- **Persist immediately** to the right layer: user preferences →
+  `agentAPI.config.set(...)`; structural changes (apps, skills, rules) →
+  `## Agent Profile` in this file; reusable routines → learned skills.
+- **Evolve the profile**: autonomy, notifications and style will drift over
+  time — update `## Agent Profile` as you learn, and confirm significant
+  changes with the user.
+- Ask a preference question when it improves future work, but never
+  interrogate — infer quietly from behavior and confirm in passing.
+
 ## Agent Profile
 
 > This section is populated by the setup skill. If empty, run setup first.
