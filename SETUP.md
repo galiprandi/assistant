@@ -45,20 +45,26 @@ the appropriate method for their OS (winget on Windows, brew on macOS,
 apt/dnf/pacman on Linux). If the user declines or installation isn't
 possible, explain what's needed and stop.
 
-### 2. Pick a folder and a role
+### 2. Name the agent, its role, then the folder
 
-Ask the user two things:
+Ask the user in this order — each answer suggests the next:
 
-1. **Folder name** for this agent (default: `assistant`). If it already
-   exists and isn't empty, ask for another name.
+1. **Agent's name** — "What do you want to call your agent?" (e.g. Donna)
 2. **Agent's role** — what's this agent for? Examples: personal assistant,
    taxes/accounting, social media & marketing, research, sales. The role
    shapes the Agent Profile and which apps get connected later.
+3. **Folder name** — suggest a slug derived from the name (e.g. `donna`,
+   `donna-taxes`). If it already exists and isn't empty, propose another
+   slug. Confirm with the user before cloning.
 
 ```bash
 git clone https://github.com/galiprandi/assistant.git <folder>
 cd <folder>
 ```
+
+Then write the name (and role if it fits) into `AGENTS.md` under
+`## Agent Profile` → `### Agent`, e.g. `- **Name:** Donna`,
+`- **Role:** taxes`.
 
 ### 3. Install the browser
 
@@ -83,14 +89,7 @@ All skills pinned in `skills-lock.json`:
 npx skills experimental_install -y
 ```
 
-### 5. Name the agent
-
-Ask the user: "What do you want to call your agent?" Then edit `AGENTS.md`:
-under `## Agent Profile` → `### Agent`, write the chosen name, e.g.
-`- **Name:** Donna`. If the role from step 2 fits, note it too
-(`- **Role:** taxes`).
-
-### 6. Run the onboarding
+### 5. Run the onboarding
 
 Read `.agents/skills/setup/SKILL.md` and execute it now, in this session.
 The setup skill asks the remaining questions (function, autonomy, apps,
@@ -107,7 +106,7 @@ At the end it will also offer, optionally:
   for the OS-level service and `npx pm2 save`. Manage with
   `npm run daemon:logs` / `npm run daemon:stop`.
 
-### 7. Hand off
+### 6. Hand off
 
 When setup finishes, tell the user:
 
