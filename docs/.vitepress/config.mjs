@@ -2,8 +2,8 @@ import { defineConfig } from 'vitepress'
 
 export default defineConfig({
   title: 'Assistant',
-  description: 'Tu asistente personal que hace las tareas repetitivas por vos.',
-  lang: 'es-AR',
+  description: 'Your personal assistant that does the repetitive tasks for you.',
+  lang: 'en',
   cleanUrls: true,
   base: '/assistant/',
 

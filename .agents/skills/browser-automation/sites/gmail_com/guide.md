@@ -1,7 +1,7 @@
 ---
 name: gmail
 description: Automate Gmail with playwright-cli. Covers reading inbox via Atom feed, composing emails (with validated selectors), replying, searching, archiving, labeling, keyboard shortcuts, and bulk delete. Use when checking email, sending messages, managing inbox, or extracting email data. Part of the browser-automation skill.
-verified: 2026-09-02
+verified: 2026-09-08
 ---
 
 # Gmail Automation
@@ -12,18 +12,113 @@ Automate Gmail via `playwright-cli` using a mix of UI interactions, keyboard sho
 
 Gmail has extensive keyboard shortcuts. They work with `node .agents/skills/browser-automation/scripts/browser.js exec press <key>`.
 
-**Must enable:** Settings → See all settings → General → Keyboard shortcuts: ON
+### PREREQUISITE: Enable keyboard shortcuts (per account)
+
+Gmail keyboard shortcuts are **disabled by default**. They must be enabled per account — enabling on one account does NOT enable them on others.
+
+**Enable via UI:**
+1. Settings (gear icon) → See all settings → General
+2. Scroll to "Keyboard shortcuts" / "Combinaciones de teclas"
+3. Select "Keyboard shortcuts on" / "Habilitar combinaciones de teclas"
+4. Click "Save Changes" / "Guardar cambios" at the bottom
+5. **Reload Gmail** (navigate to `#inbox`) — settings take effect on next page load
+
+**Enable via eval (automated):**
+```bash
+# Navigate to settings, enable, save, and return to inbox in one flow
+node .agents/skills/browser-automation/scripts/browser.js goto "https://mail.google.com/mail/u/0/#settings/general"
+node .agents/skills/browser-automation/scripts/browser.js exec eval "(async function(){
+  // Wait for settings page to load
+  for (let i = 0; i < 30; i++) {
+    const radios = document.querySelectorAll('input[type=radio]');
+    if (radios.length > 5) break;
+    await new Promise(r => setTimeout(r, 300));
+  }
+  // Find the 'on' radio (not checked) and click it
+  const labels = Array.from(document.querySelectorAll('td'));
+  const onLabel = labels.find(td => {
+    const t = td.textContent.trim();
+    return (t === 'Keyboard shortcuts on' || t === 'Habilitar combinaciones de teclas');
+  });
+  if (onLabel) {
+    const radio = onLabel.querySelector('input[type=radio]');
+    if (radio && !radio.checked) { radio.click(); }
+  }
+  // Click Save Changes
+  const saveBtn = Array.from(document.querySelectorAll('button')).find(b =>
+    b.textContent.includes('Save Changes') || b.textContent.includes('Guardar cambios')
+  );
+  if (saveBtn) { saveBtn.click(); return 'saved'; }
+  return 'save_not_found';
+})()"
+# Wait for navigation back to inbox
+node .agents/skills/browser-automation/scripts/browser.js exec eval "(async function(){
+  for (let i = 0; i < 30; i++) {
+    if (location.hash.includes('#inbox')) return 'inbox';
+    await new Promise(r => setTimeout(r, 300));
+  }
+  return 'timeout';
+})()"
+```
+
+**Verify shortcuts are enabled:**
+```bash
+# Press ? (Shift+/) — should open keyboard shortcuts help dialog
+node .agents/skills/browser-automation/scripts/browser.js exec press "Shift+/"
+node .agents/skills/browser-automation/scripts/browser.js exec eval "(function(){
+  const dialog = document.querySelector('[role=dialog]');
+  if (dialog && dialog.innerText.toLowerCase().includes('shortcut')) return 'enabled';
+  return 'not_enabled_or_no_dialog';
+})()"
+```
+
+### CRITICAL: Focus requirement before shortcuts
+
+Gmail ignores ALL keyboard shortcuts when an `INPUT`, `TEXTAREA`, or `contenteditable` element has focus. This is the #1 reason shortcuts appear to "not work."
+
+**Before pressing any shortcut key, blur the active element and focus the body:**
+```bash
+node .agents/skills/browser-automation/scripts/browser.js exec eval "(function(){
+  if (document.activeElement && ['INPUT','TEXTAREA'].includes(document.activeElement.tagName)) {
+    document.activeElement.blur();
+  }
+  document.body.focus();
+  return 'body_focused';
+})()"
+```
+
+**Symptom:** You press `j` but no email row gets selected. Check `document.activeElement.tagName` — if it's `INPUT`, shortcuts won't fire.
+
+### CRITICAL: Two-key sequences must use `+` notation
+
+Gmail two-key shortcuts (like `g` then `i`) must be sent as a **single `press` call with `+` notation**, NOT as two separate calls. Separate calls have too much latency between them — Gmail's sequence timeout expires.
+
+**CORRECT (works):**
+```bash
+node .agents/skills/browser-automation/scripts/browser.js exec press "g+i"   # Go to Inbox
+node .agents/skills/browser-automation/scripts/browser.js exec press "g+s"   # Go to Starred
+node .agents/skills/browser-automation/scripts/browser.js exec press "g+t"   # Go to Sent
+node .agents/skills/browser-automation/scripts/browser.js exec press "g+a"   # Go to All Mail
+```
+
+**WRONG (does not work — too much latency between calls):**
+```bash
+node .agents/skills/browser-automation/scripts/browser.js exec press g
+node .agents/skills/browser-automation/scripts/browser.js exec press i   # Gmail already forgot the 'g'
+```
+
+**Why it works:** Playwright's `keyboard.press("g+i")` sends both keydown events in rapid succession through CDP, fast enough for Gmail's sequence window. The events are `isTrusted: true`, so Gmail accepts them as real user input.
 
 ### Navigation
 
-| Shortcut | Action |
-|---|---|
-| `g` then `i` | Go to Inbox |
-| `g` then `s` | Go to Starred |
-| `g` then `t` | Go to Sent |
-| `g` then `d` | Go to Drafts |
-| `g` then `a` | Go to All Mail |
-| `g` then `l` | Go to Label (opens label picker) |
+| Shortcut | Action | Notation |
+|---|---|---|
+| `g+i` | Go to Inbox | `press "g+i"` |
+| `g+s` | Go to Starred | `press "g+s"` |
+| `g+t` | Go to Sent | `press "g+t"` |
+| `g+d` | Go to Drafts | `press "g+d"` |
+| `g+a` | Go to All Mail | `press "g+a"` |
+| `g+l` | Go to Label (opens label picker) | `press "g+l"` |
 
 ### Email actions
 
@@ -67,16 +162,22 @@ Gmail has extensive keyboard shortcuts. They work with `node .agents/skills/brow
 ### Usage with playwright-cli
 
 ```bash
+# IMPORTANT: Blur any focused input before pressing shortcuts
+node .agents/skills/browser-automation/scripts/browser.js exec eval "(function(){document.activeElement?.blur();document.body.focus();return 'ok';})()"
+
 # Select first email, then archive it
+node .agents/skills/browser-automation/scripts/browser.js exec press j
 node .agents/skills/browser-automation/scripts/browser.js exec press x
 node .agents/skills/browser-automation/scripts/browser.js exec press e
 
-# Go to sent mail (two-key shortcut with short delay)
-node .agents/skills/browser-automation/scripts/browser.js exec press g
-node .agents/skills/browser-automation/scripts/browser.js exec press t
+# Go to inbox (two-key shortcut — MUST use + notation in single call)
+node .agents/skills/browser-automation/scripts/browser.js exec press "g+i"
+
+# Go to sent mail
+node .agents/skills/browser-automation/scripts/browser.js exec press "g+t"
 ```
 
-**Note:** Two-key shortcuts (like `g` then `i`) require a small delay between keys.
+**Note:** Two-key shortcuts (like `g`+`i`) MUST use `+` notation in a single `press` call. Two separate calls do NOT work — the latency between CLI calls exceeds Gmail's sequence timeout.
 
 ## Setup
 
@@ -341,6 +442,16 @@ Gmail compose is **NOT** an iframe. It is `div[role=dialog]` in the main documen
 | Subject | `input[aria-label="Asunto"]` | English: `aria-label="Subject"` |
 | Body | `textarea[aria-label="Cuerpo del mensaje"]` | English: `aria-label="Message body"`. NOT a contenteditable div |
 | Send button | `div[role=button][aria-label*="Enviar"]` | English: `aria-label*="Send"` |
+
+**⚠️ Gemini editor trap (validated 2026-10-05):** Gmail now renders TWO `div[contenteditable=true]` areas — the real body `aria-label="Cuerpo del mensaje"` AND a Gemini helper `aria-label="Describe tu mensaje"` (English: `"Message body"` and `"Describe your message"`). The body may be a `textarea` OR a `contenteditable` div depending on compose mode — select by `aria-label`, never "the last visible contenteditable" or `.pop()` on all contenteditables: that grabs the Gemini box, the text appears on screen, and **the email goes out blank** (verified by self-send). Always filter on the body label:
+
+```js
+document.querySelector('textarea[aria-label="Cuerpo del mensaje"], div[contenteditable=true][aria-label="Cuerpo del mensaje"], div[contenteditable=true][aria-label="Message body"]')
+```
+
+Same trap in **inline replies** (the reply draft at thread bottom has the same pair of editors).
+
+**✅ Keyboard-first compose (PREFERRED — no selectors, immune to the Gemini trap):** `press c` opens compose with focus already on **To** → `type` the address → `Enter` confirms the chip → `Tab` to Subject → `type` → `Tab` to body → `type` → `press "Control+Enter"` sends. Same for replies: `press r` inside a thread opens the reply editor with focus on the body. Zero DOM selectors needed.
 
 ### Open compose dialog
 

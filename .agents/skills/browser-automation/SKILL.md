@@ -49,6 +49,21 @@ These patterns are universal — they work in Gmail, LinkedIn, WhatsApp, Outlook
 | Confirm dialog | `Enter` | Accept confirm dialogs, "Are you sure?" prompts |
 | Cancel dialog | `Escape` | Cancel instead of confirm |
 
+### Keyboard interaction by control type
+
+Standard HTML5 controls have predictable keyboard behavior. Use these instead of clicking:
+
+| Control | Keys | Action |
+|---|---|---|
+| `input[type=text\|email\|password\|number\|tel\|url]` | `Tab` → `type <value>` | Focus then type |
+| `input[type=checkbox]` | `Tab` → `Space` | Toggle checked/unchecked |
+| `input[type=radio]` | `Tab` to group → `ArrowDown`/`ArrowRight` | Change selected option |
+| `select` | `Tab` → `Enter` or `Alt+ArrowDown` → `ArrowDown`/`ArrowUp` → `Enter` | Open, navigate, confirm |
+| `textarea` | `Tab` → `type <text>` (`Shift+Enter` for line breaks) | Focus then type |
+| `button[submit]` | `Tab` → `Enter` or `Space` | Submit (or `Enter` from last text input) |
+
+**Form workflow:** `Tab` into the first field → type → `Tab` to next → type → repeat → `Enter` to submit. One sequential flow, no snapshots, no clicks.
+
 ### How to use keyboard navigation
 
 ```bash
@@ -125,7 +140,7 @@ If a site has a guide, you will see it. If you don't see a guide, the site is no
 |---|---|---|
 | Gmail | `sites/gmail_com/guide.md` | Before any Gmail operation (compose, reply, read inbox, search, delete) |
 | LinkedIn | `sites/linkedin_com/guide.md` | Before any LinkedIn operation (messaging, connections, jobs, Easy Apply, notifications) |
-| Microsoft Teams | `sites/teams_com/guide.md` | Before any Teams operation (send/delete messages via chatsvc API, token extraction) |
+| Microsoft Teams | `sites/teams_com/guide.md` | Before any Teams operation (send/delete messages via keyboard, Markdown support, chat navigation) |
 | Outlook Web | `sites/outlook_office_com/guide.md` | Before any Outlook Web operation (read, compose, reply, archive, search) |
 | WhatsApp Web | `sites/whatsapp_com/guide.md` | Before any WhatsApp operation (send messages, read conversations, voice notes) |
 | Discord | `sites/discord_com/guide.md` | Before any Discord operation (messaging, navigation, voice) |
@@ -135,6 +150,8 @@ If a site has a guide, you will see it. If you don't see a guide, the site is no
 | Reddit | `sites/reddit_com/guide.md` | Before any Reddit operation (reading posts/comments, posting submissions, replying to comments, posting in megathreads) |
 | Google Maps | `sites/google_com/maps-guide.md` | Before any Google Maps operation (search, directions, navigation, layers) |
 | Facebook | `sites/facebook_com/guide.md` | Before any Facebook operation (groups, feed, chat, posts) |
+| Cloudflare Dashboard | `sites/dash_cloudflare_com/guide.md` | Before any Cloudflare operation (Quick Search, ARIA tablist navigation, Email Routing, DNS) |
+| Web3Forms | `sites/app_web3forms_com/guide.md` | Before any Web3Forms operation (submissions, settings, spam protection, form config) |
 
 **Before each interaction with a documented site:** grep the specific pattern you need (compose, reply, send, fill, contenteditable, etc.) in the site guide. Do not trial-and-error blindly. The guides contain validated methods and explicit warnings about what does NOT work.
 
@@ -202,11 +219,40 @@ node .agents/skills/browser-automation/scripts/browser.js exec find "text to sea
 node .agents/skills/browser-automation/scripts/browser.js exec press Enter
 ```
 
+**Wait for DOM to settle** (after clicks/navigation, instead of `sleep`):
+```bash
+node .agents/skills/browser-automation/scripts/browser.js wait-dom [--quiet <ms>] [--timeout <ms>]
+# waits until no DOM mutations for <quiet> ms (default 250), bounded by <timeout> (default 3000)
+```
+
+**Wait for a target to appear** (in-page polling, no shell sleep):
+```bash
+node .agents/skills/browser-automation/scripts/browser.js wait-for "css=.result"      # visible selector
+node .agents/skills/browser-automation/scripts/browser.js wait-for "text=Message sent" # body text, case-insensitive
+node .agents/skills/browser-automation/scripts/browser.js wait-for "js=() => !!window.appReady" --timeout 15000
+```
+
+**Observe page state** (compact, decision-oriented — preferred input for agents):
+```bash
+node .agents/skills/browser-automation/scripts/browser.js observe
+# → JSON: url, title, h1, scroll, up to 50 interactive elements ordered by
+#   viewport proximity (el0..el49), visible alerts. ~4KB vs 50KB+ snapshots.
+```
+
+**Batch commands** (one process, N commands over the session socket):
+```bash
+echo '[["eval","(() => location.href)()"],["find","Send"],["press","Enter"]]' \
+  | node .agents/skills/browser-automation/scripts/browser.js batch
+# → JSON array [{i, ok, ms, text}]. Stops on first error;
+#   {"commands":[...],"continueOnError":true} to continue.
+```
+
 **Key wrapper behaviors:**
 - `--profile=.browser-profile` is hardcoded. Cannot be omitted.
 - Profile resolves to `process.cwd()/.browser-profile` (the consuming repo's root), not the skill directory.
-- If a session is already running, `open` auto-navigates instead of failing.
+- If a session is already running, `open` auto-navigates instead of failing — **unless** the session uses a different profile or headless mode when headed is configured (rogue sessions from bare `playwright-cli open` are closed and reopened correctly).
 - Site guides are auto-injected into stdout on `open`, `goto`, and `tab-new` when a matching guide exists.
+- `exec` uses the session daemon's unix socket directly when a session is open (fast path, ~0.5s vs ~2.6s spawn). Falls back to spawning `playwright-cli` automatically. `BROWSER_NO_FAST=1` disables it. Lifecycle/interactive commands (`open`, `close`, `pause`, …) always use the spawn path.
 
 For the full command list (tabs, auth state, debugging), see [references/profile-management.md](references/profile-management.md).
 
@@ -216,11 +262,12 @@ These rules were validated through extensive testing. Breaking them causes failu
 
 1. **KEYBOARD FIRST** — Before any interaction, ask: "Can I do this with the keyboard?" If yes, use `exec press`. Only fall back to clicks/snapshots if no shortcut exists. This is Rule 0 — it overrides all other rules.
 2. **eval > ref-based clicks** — Refs don't persist between CLI calls. Use `eval` to find and click by text in one atomic call.
-3. **In-page polling > shell sleep** — Shell `sleep` kills the session. Use `eval` with `await` polling to wait for elements.
+3. **In-page polling > shell sleep** — Shell `sleep` kills the session. Use `wait-dom` (waits until DOM mutations go quiet) or `eval` with `await` polling to wait for elements.
 4. **Read snapshot file as fallback** — When `exec snapshot` fails, read the auto-generated `.playwright-cli/page-*.yml` file.
 5. **Use URLs directly, not clicks for navigation** — `goto "https://..."` is more reliable than clicking nav links.
 6. **Verify with DOM content, not URL** — SPAs update content without changing the URL. Check DOM state with `eval`.
 7. **Batch operations into a single eval call** — Wait + click + verify in one `eval` is more robust than multiple CLI calls.
+8. **Accessibility-first navigation: keyboard over snapshot/click loops** — Even without app shortcuts, standard keyboard navigation beats the snapshot→click→snapshot→click cycle. Fill forms end-to-end via keyboard: focus the first field, type, `Tab` to the next, repeat, `Enter` to submit — one sequential flow, no refs needed. Use `Tab`/`Shift+Tab` between controls, `Enter`/`Space` to activate, arrow keys in radios/selects/menus, `Esc` to close overlays. Keyboard focus follows the accessibility tree, not generated CSS classes, so it survives site redeploys. It also produces input events closer to a human's, which **mitigates bot detection** triggered by programmatic ref/coordinate clicks. Interaction preference order: (1) app keyboard shortcuts, (2) standard keyboard navigation, (3) internal API via `eval` + fetch, (4) ref-based clicks as last resort. Always verify focus landed where expected by checking DOM state (Rule 6) — never assume.
 
 **Chaining:** Chain `open && eval` in a single shell command to prevent session death between calls.
 

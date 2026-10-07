@@ -7,11 +7,17 @@
       "skillPath": "agent-desk/SKILL.md",
       "computedHash": "9aa0992c4b0357b51f97d79577519cb6497f018d8cad770c70f1fb90c471fd05"
     },
+    "android-automation": {
+      "source": "galiprandi/skills",
+      "sourceType": "github",
+      "skillPath": "android-automation/SKILL.md",
+      "computedHash": "0dce670b709017540cdf81d09265ffb8b79a27e2d61bc3f21144f0894d580bcb"
+    },
     "browser-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "a159a77856d9f4cbd258dcac30b54ea6fa4ea2696adcc0942fb25f420c6a8e87"
+      "computedHash": "8538fa573adf391df675e290915e6c32de10928f796007bfd548e2864cac5fc1"
     }
   }
 }

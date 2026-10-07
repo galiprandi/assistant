@@ -22,7 +22,7 @@ This skill runs the **first time** a user opens the assistant repo. It guides an
 
 ## Prerequisites
 
-- **Skills up to date** — run `npx skills update` before starting setup to ensure the latest skill versions
+- **Skills up to date** — run `npm run update` before starting setup to ensure the latest skill versions
 - `browser-automation` skill installed
 - `agent-desk` skill installed
 - agent-desk deployed and accessible (default: `https://galiprandi.github.io/agent-desk/`)
@@ -220,24 +220,25 @@ Verify `.gitignore` includes at minimum:
 .env
 .env.*
 *.state.json
+acp-connector.jsonc
 ```
 
 If any are missing, add them.
 
 **Check 2 — AGENTS.md privacy decision:**
 
-After setup, `AGENTS.md` contains the user's identity, autonomy rules, connected apps, and communication style. If the repo is pushed to GitHub, all of that is public.
+`AGENTS.md` is tracked by the upstream repo. After setup, its `## Agent Profile` section contains the user's identity, autonomy rules, connected apps, and communication style. If the user pushes this repo anywhere public, all of that is public.
 
 Ask the user:
 
-> Your AGENTS.md will now contain your personal profile. If you push this repo to GitHub, that information will be public. How do you want to handle this?
+> Your AGENTS.md will now contain your personal profile. If you push this repo to a public remote, that information will be public. How do you want to handle this?
 
 Options:
-- **Private repo** — keep AGENTS.md tracked, but make the GitHub repo private (recommended if they want version control of their profile)
-- **Ignore AGENTS.md** — add `AGENTS.md` to `.gitignore` so it stays local only. The template's `AGENTS.md` stays tracked, but the user's filled-in version is never committed. (Recommended for public repos)
-- **Accept** — the user understands and accepts that their profile will be public
+- **Keep it local** — don't push at all (default; simplest and safest)
+- **Private repo** — push to a private GitHub repo only
+- **Accept public** — the user understands and accepts that their profile will be public
 
-If "Ignore AGENTS.md": add `AGENTS.md` to `.gitignore` and run `git rm --cached AGENTS.md` if it's already tracked. The file stays on disk but won't be committed in future pushes. Note: previous commits in git history still contain the template version (without personal data), so no cleanup is needed.
+Note: `AGENTS.md` must stay tracked — upstream updates rely on it (the `## Agent Profile` section is never touched upstream, so pulls merge cleanly). Do NOT gitignore or `git rm --cached` it — a later `git pull` would restore it as tracked anyway and could silently publish the profile on the next push.
 
 **Check 3 — No secrets staged:**
 
@@ -249,12 +250,62 @@ Run `git status` and verify no sensitive files are staged:
 
 If any are found, remove them from staging and confirm they're gitignored.
 
-### Step 13 — Wrap up
+### Step 13 — Phone control (optional connect)
+
+Ask the user:
+
+> Do you want to talk to me from your phone? I can bridge this agent to Telegram and/or Discord — you only log in, I do the rest.
+
+If yes, the agent drives the whole flow — the user does nothing but log in:
+
+1. **Telegram:** open Telegram Web in the agent's own browser
+   (`node .agents/skills/browser-automation/scripts/browser.js`), let the
+   user log in, then open a chat with **@BotFather**, send `/newbot`,
+   walk the bot creation, and capture the token BotFather replies with.
+   If the user already has a bot token, ask for it directly instead.
+2. **Discord:** open the Discord Developer Portal
+   (`discord.com/developers/applications`) in the same browser, let the
+   user log in, and guide/perform creating an application + bot to obtain
+   the token. Ask the user to invite the bot to their server if they want
+   one (or configure it to accept DMs).
+3. Ask which agent command to bridge (detect installed CLIs: `devin acp`,
+   `claude`, `opencode`, `codex`, `gemini`, ...).
+4. Write `acp-connector.jsonc` (gitignored) with the collected tokens and
+   agent command — or run `npm run connect:setup` if the wizard is easier
+   to drive from the terminal.
+5. Test it: `npm run connect` in the background, send a test message to
+   the bot, confirm a reply arrives, then stop it (or keep running if the
+   user enables always-on next).
+
+If the user declines, skip without pressure — it can be enabled any time
+later by asking the agent.
+
+### Step 14 — Always-on (optional)
+
+If connect was configured, ask:
+
+> Do you want me reachable 24/7? I can keep the bridge running as a daemon
+> that survives reboots.
+
+If yes:
+
+```bash
+npm run daemon          # pm2 start + pm2 save (via npx)
+npx pm2 startup         # generates the OS service (systemd/launchd/schtasks)
+```
+
+`pm2 startup` may print a command the user must run with sudo/admin — relay
+it to them exactly. Manage later with `npm run daemon:logs` and
+`npm run daemon:stop`.
+
+### Step 15 — Wrap up
 
 1. Tell the user setup is complete
 2. Summarize the configuration
-3. End the session: `agentAPI.session.end({summary: "Setup complete. Agent configured for <function>."})`
-4. Ask if they want to start using the agent now
+3. If connect/daemon were skipped, note they can enable them any time by
+   just asking
+4. End the session: `agentAPI.session.end({summary: "Setup complete. Agent configured for <function>."})`
+5. Ask if they want to start using the agent now
 
 ## Golden rules
 

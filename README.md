@@ -45,27 +45,34 @@ The agent reads `AGENTS.md` — that's its identity, skills, and rules. The fold
 
 ## Connect to Telegram or Discord (optional)
 
+The onboarding offers this at the end — or just ask your agent anytime: *"connect me to Telegram"*. The agent opens Telegram Web or the Discord Developer Portal **in its own browser**, you only log in, and it obtains the bot token and writes `acp-connector.jsonc` (gitignored — contains bot tokens) itself. Zero manual steps.
+
+To run the bridge manually:
+
 ```bash
-./Assistant connect
+npm run connect        # bridge in the foreground
+npm run connect:setup  # acp-connector wizard (terminal alternative)
 ```
 
-This runs the [acp-connector](https://github.com/galiprandi/acp-connector) setup wizard (first time) and starts the bridge. The wizard asks for:
-
-- **Your agent command** — e.g. `devin acp` (any ACP agent works)
-- **Telegram bot token** — create one via [@BotFather](https://t.me/BotFather) (`/newbot`), and/or
-- **Discord bot token** — from the [Discord Developer Portal](https://discord.com/developers/applications)
-
-Config is saved to `acp-connector.jsonc` (gitignored — contains your bot tokens). After setup, every `./Assistant connect` run just starts the bridge. Send a message to your bot and it's forwarded to your agent.
-
 acp-connector also supports routines (named reusable prompts), cron jobs, and an optional HTTP API — see its README for details.
+
+## Always-on (optional)
+
+Keep the bridge running 24/7 as a daemon — survives reboots:
+
+```bash
+npm run daemon         # pm2 start + save (via npx)
+npx pm2 startup        # one-time: installs the OS service (systemd/launchd/schtasks)
+```
+
+Manage it with `npm run daemon:logs` and `npm run daemon:stop`.
 
 ## Commands
 
 ```
-./Assistant init      First-run setup: create AGENTS.md, detect agents
-./Assistant connect   Bridge to Telegram/Discord via acp-connector (optional)
-./Assistant update    Pull repo updates (git pull) + update skills
-./Assistant           Show status and launch instructions
+npm run connect        Bridge to Telegram/Discord via acp-connector
+npm run daemon         Run the bridge always-on via pm2
+npm run update         Pull repo updates (git pull) + update skills
 ```
 
 ## Architecture
@@ -100,7 +107,7 @@ acp-connector also supports routines (named reusable prompts), cron jobs, and an
 │  │  └─────────────┘  └──────────────┘                       │ │
 │  └──────────────────────────────────────────────────────────┘ │
 │                                                                │
-│  Optional: ./Assistant connect                                 │
+│  Optional: npm run connect / daemon                            │
 │     │                                                          │
 │     ▼                                                          │
 │  ┌──────────────────┐      ┌──────────────┐                    │
@@ -121,19 +128,28 @@ acp-connector also supports routines (named reusable prompts), cron jobs, and an
 
 ## Skills
 
-### Installed from `galiprandi/skills`
+### Installed from `galiprandi/skills` (maintained)
 
 - **browser-automation** — control a browser via playwright-cli (navigate, fill forms, read content, call internal site APIs)
 - **agent-desk** — dashboard with sync API for tasks, events, sessions, and config
+- **android-automation** — control an Android device via adb
+
+> **Security invariant:** agents must always use the repo's own
+> `browser-automation` script (`node .agents/skills/browser-automation/scripts/browser.js`)
+> and `android-automation` for device tasks — never the agent harness's
+> built-in browser/emulator. That keeps every session cookie inside this
+> repo's `.browser-profile/`, so credentials never leak outside the agent's
+> self-contained perimeter.
 
 ### Repo-local
 
 - **setup** — first-run onboarding (not published, lives only in this repo)
+- **learned skills** — the agent creates new skills under `.agents/skills/` when it discovers repeatable routines, capturing the steps and your preferences
 
 ## Updating
 
 ```bash
-./Assistant update
+npm run update
 ```
 
 This runs `git pull` (your clone tracks the upstream repo) and updates skills to their latest versions — all in one command. Your `## Agent Profile` section in `AGENTS.md`, `acp-connector.jsonc`, and personal data are never touched upstream, so merges stay clean. If `AGENTS.md` changed, review the `## What's new` section.
@@ -166,7 +182,7 @@ This updates `skills-lock.json` automatically.
 
 ### Reconfigure the agent
 
-Edit the `## Agent Profile` section of your `AGENTS.md` — upstream updates never touch it. When `AGENTS.md` changes upstream, `./Assistant update` warns you to review the `## What's new` section.
+Edit the `## Agent Profile` section of your `AGENTS.md` — upstream updates never touch it. When `AGENTS.md` changes upstream, review the `## What's new` section after `npm run update`.
 
 To start fresh: reset the profile section to its placeholders, or re-run the `setup` skill.
 
@@ -206,23 +222,22 @@ Multiple agents = multiple containers, same image, different volumes. No collisi
 
 - **An agent that can run shell commands** — e.g. [Devin](https://devin.ai), [Claude Code](https://claude.com/product/claude-code), [OpenCode](https://opencode.ai), Codex, Gemini CLI. This is the only hard requirement: the agent installs everything else.
 - Node.js 22+ and git — the agent checks (and installs them with your permission) during setup
-- Optional: a Telegram bot token ([@BotFather](https://t.me/BotFather)) or Discord bot token, if you want chat control
+- Optional: Telegram or Discord account if you want chat control — the agent obtains the bot tokens itself during onboarding, you only log in
 
 ## Repo structure
 
 ```
 assistant/
-├── Assistant                   # Launcher script (init, connect, update, status)
 ├── AGENTS.md                   # Agent identity + your profile section (tracked)
 ├── SETUP.md                    # Agent-facing install instructions (paste its URL to your agent)
 ├── acp-connector.jsonc         # Telegram/Discord bridge config (gitignored, optional)
 ├── README.md                   # This file
 ├── LICENSE                     # MIT
-├── .gitignore                  # Ignores .env, .browser-profile/, acp-connector.jsonc, etc.
+├── package.json                # npm scripts: connect, daemon, update (+ docs tooling)
+├── .gitignore                  # Ignores .browser-profile/, acp-connector.jsonc, etc.
 ├── .playwright/                # playwright-cli workspace marker — REQUIRED for per-repo session isolation
 │   └── cli.config.json         # browser channel, timeouts, ad/tracker blocking
 ├── skills-lock.json            # Lock file for skill versions
-├── package.json                # Docs tooling (vitepress)
 ├── .agents/
 │   └── skills/
 │       ├── browser-automation/ # Browser control via playwright-cli
@@ -230,10 +245,12 @@ assistant/
 │       │   ├── scripts/browser.js
 │       │   ├── references/     # golden-rules, api-capture, etc.
 │       │   └── sites/          # per-app guides (gmail, whatsapp, ...)
+│       ├── android-automation/ # Android control via adb
 │       ├── agent-desk/         # Dashboard API for tasks/events/sessions
 │       │   ├── SKILL.md
 │       │   └── references/
-│       └── setup/              # First-run onboarding (repo-local)
+│       ├── setup/              # First-run onboarding (repo-local)
+│       └── <learned>/          # Skills the agent creates for repeatable routines
 └── .claude/
     └── skills/                 # Symlinks → .agents/skills/ (for Claude Code)
 ```

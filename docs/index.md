@@ -3,133 +3,119 @@ layout: home
 
 hero:
   name: Assistant
-  text: Tu asistente personal
-  tagline: Le enseñás rutinas, él las hace solo. Responde WhatsApp, manda mails, entra a sitios web. Lo controlás desde Telegram o tu IDE.
+  text: Your personal assistant
+  tagline: Teach it a routine once, it does it alone. Answers WhatsApp, sends emails, browses websites. Control it from Telegram, Discord, or your IDE.
   actions:
     - theme: brand
-      text: Empezar
-      link: '#como-empezar'
+      text: Get started
+      link: '#getting-started'
     - theme: alt
-      text: Ver en GitHub
+      text: View on GitHub
       link: https://github.com/galiprandi/assistant
 
 features:
-  - title: Hace las tareas repetitivas
-    details: Le enseñás una rutina una vez y la repite cuando se la pedís. Revisar mensajes, mandar mails, entrar a sitios, descargar reportes.
+  - title: Handles repetitive tasks
+    details: Teach it a routine once and it repeats it on demand. Check messages, send emails, browse sites, download reports.
     icon: 🔄
-  - title: Controla el navegador
-    details: Opera un Chromium real. Entra a WhatsApp, Gmail, LinkedIn y cualquier sitio web como lo harías vos.
+  - title: Drives a real browser
+    details: Operates a real Chromium. It goes into WhatsApp, Gmail, LinkedIn and any website just like you would.
     icon: 🌐
-  - title: Telegram opcional
-    details: Manejá tu asistente desde el celular con un bot de Telegram. O usalo desde tu IDE. Vos elegís.
+  - title: Telegram & Discord optional
+    details: Run your assistant from your phone with a Telegram or Discord bot. Or use it from your IDE. Your call.
     icon: 💬
-  - title: 15+ modelos de IA
-    details: Anthropic, OpenAI, Google, Groq, OpenRouter y más. Elegís el provider y el modelo que mejor te funcione.
+  - title: Your favorite agent
+    details: Works with any agent that can run shell commands: Devin, Claude Code, OpenCode, Codex, Gemini CLI. The repo is the identity — the agent is your choice.
     icon: 🧠
-  - title: Multi-agente
-    details: Cloná el repo con nombres distintos y tené varios asistentes aislados en la misma máquina. Cada uno con su navegador y su bot.
+  - title: Multi-assistant
+    details: Each assistant is just a folder. Run several isolated assistants on the same machine, each with its own browser, bots and data.
     icon: 🤖
-  - title: Tu data es tuya
-    details: Todo corre local. Sin nube, sin telemetry, sin backend. Tus claves y tu navegador quedan en tu máquina.
+  - title: Your data stays yours
+    details: Everything runs locally. No cloud, no telemetry, no backend. Your keys and your browser stay on your machine.
     icon: 🔒
 ---
 
-## Qué es
+## What it is
 
-Assistant es un agente personal que aprende tus rutinas y las ejecuta solo. Le mostrás una tarea una vez (responder WhatsApp, mandar un mail, entrar a un sitio y descargar algo) y la próxima vez le decís "hacé lo de siempre" y lo hace.
+Assistant is a home for your personal agent: a repo holding its identity, its skills and its memory. Show it a task once (reply on WhatsApp, send an email, download a report from some site) and next time you just say "do the usual" and it does it.
 
-No es un chatbot. Es un agente real que controla un navegador, entra a tus apps, lee y responde mensajes, y hace el trabajo repetitivo por vos.
+It doesn't ship its own agent — you bring the one you already use (Devin, Claude Code, OpenCode, any agent that can run shell commands). The repo provides the identity; the agent is replaceable.
 
-## Qué necesitás
+## What you need
 
-- **Node.js 22+** — [descargalo acá](https://nodejs.org/)
-- **Un IDE conversacional** — alguno que pueda correr comandos y leer archivos. Sugerimos:
+- **An agent that can run commands** — that's the only requirement. The agent installs everything else:
+  - [Devin](https://devin.ai)
   - [Claude Code](https://claude.com/product/claude-code) (Anthropic)
-  - [Codex](https://openai.com/codex) (OpenAI)
-  - [OpenRouter](https://openrouter.ai/) (multi-provider, modelos gratis disponibles)
-- **Una API key** — del provider que elijas (Anthropic, OpenAI, Google, etc.)
-- **Telegram** (opcional) — solo si querés controlarlo desde el celular
+  - [OpenCode](https://opencode.ai) (open source)
+  - Codex, Gemini CLI, or any other agent with a terminal
+- **Telegram or Discord** (optional) — only if you want to control it from your phone
 
-## Cómo empezar
+## Getting started
 
-### 1. Fork este repo
+### 1. Paste this to your agent
 
-Andá a [github.com/galiprandi/assistant](https://github.com/galiprandi/assistant) y clickeá **Fork** arriba a la derecha.
+```
+Install a personal assistant following these instructions:
+https://raw.githubusercontent.com/galiprandi/assistant/main/SETUP.md
+```
 
-### 2. Cloná e inicializá
+### 2. Your agent does everything
 
-Copiá y pegá esto en tu terminal, cambiando `<tu-usuario>` por tu usuario de GitHub y `mi-asistente` por el nombre que quieras:
+Your agent will:
+
+- Verify Node and git — and if missing, **it asks and installs them with your OK**
+- Ask you for a folder name and clone the repo there (no fork needed)
+- Install the browser the assistant uses
+- Ask what you want to call your assistant
+- Start the onboarding in that same session: it asks you a few questions, requests the accesses it needs, and you're done
+
+You can repeat the process as many times as you want: **each assistant is a different folder**, with its own browser, bots and data. Nothing collides.
+
+### 3. Next time
+
+Open your assistant's folder with your IDE of choice and keep talking. The folder is its home: its identity, skills and memory live there.
+
+### 4. Connect it to Telegram or Discord (optional)
+
+At the end of onboarding the agent asks if you want phone control. If you say yes, **it does everything**: opens Telegram Web or the Discord Developer Portal in its own browser, you only log in, and it creates the bot, grabs the token and writes `acp-connector.jsonc` (gitignored). Message your bot and the assistant replies.
+
+You can also enable it anytime later — just ask: *"connect me to Telegram"*.
+
+Want it reachable 24/7? Ask for always-on and it runs the bridge as a daemon via pm2 (`npm run daemon` + `npx pm2 startup`), surviving reboots.
+
+## What it can do
+
+Some things you can ask for:
+
+- "Check WhatsApp and tell me what's new"
+- "Reply to Juan on WhatsApp saying X"
+- "Send an email to Y with the Z report"
+- "Go into site X and download the monthly report"
+- "Check LinkedIn and tell me if there are new messages"
+- "Do the usual" → repeats the last routine you taught it
+
+You teach a routine by showing the steps once. Next time, just ask and it does it alone.
+
+## Commands
 
 ```bash
-git clone --recurse-submodules git@github.com:<tu-usuario>/assistant.git mi-asistente
-cd mi-asistente
-./Assistant init
+npm run connect       # Telegram/Discord bridge via acp-connector
+npm run daemon        # Bridge always-on via pm2 (survives reboots)
+npm run update        # Pull repo updates and refresh skills
 ```
 
-`./Assistant init` te va a pedir:
+And one security guarantee worth knowing: the assistant only ever browses through its own automation script with its own `.browser-profile/` — never your agent's built-in browser. Your session cookies never leave the folder.
 
-- **Provider** — qué provider de IA vas a usar (anthropic, openai, google, etc.)
-- **Modelo** — qué modelo (ej: `claude-sonnet-4-5-20250929`)
-- **API key** — se guarda en `.env` (nunca se commitea a git)
+## Your data is yours
 
-### 3. Lanzalo
+- `AGENTS.md` — your assistant's identity; your personal data lives only in the Agent Profile section
+- `acp-connector.jsonc` — your bot tokens, never committed
+- `.browser-profile/` — browser sessions, local
+- Learned skills live in `.agents/skills/` — your routines and preferences, local to this instance
 
-```bash
-./Assistant
-```
+No cloud. No telemetry. No backend. Everything on your machine.
 
-Se abre Pi (el motor del agente) con tu configuración. Ya podés hablarle y pedirle cosas desde el IDE.
+## Built with
 
-### 4. Conectalo a Telegram (opcional)
-
-Si querés controlarlo desde el celular:
-
-1. Abrí [@BotFather](https://t.me/BotFather) en Telegram
-2. Mandá `/newbot`, elegí nombre y username
-3. Copiá el token que te da
-4. En la terminal donde corre `./Assistant`, escribí:
-
-```
-/pigram-setup
-```
-
-5. Pegá el token del bot
-6. Abrí tu bot en Telegram y mandá `/start`
-
-Listo. Ahora le escribís a tu bot desde el celular y el asistente responde.
-
-## Qué puede hacer
-
-Algunos ejemplos de lo que le podés pedir:
-
-- "Revisá WhatsApp y decime qué hay nuevo"
-- "Respondé a Juan en WhatsApp diciendo X"
-- "Mandá un mail a Y con el reporte de Z"
-- "Entrá a sitio X y descargá el reporte mensual"
-- "Revisá LinkedIn y decime si hay mensajes nuevos"
-- "Hacé lo de siempre" → repite la última rutina que le enseñaste
-
-Le enseñás una rutina mostrándole los pasos. La próxima vez, se la pedís y la hace solo.
-
-## Comandos
-
-```bash
-./Assistant init     # Configurar provider, modelo y API key
-./Assistant update   # Actualizar el script, las skills y pigram
-./Assistant          # Lanzar el asistente
-```
-
-## Tu data es tuya
-
-- `.env` — tu API key, nunca se commitea a git
-- `AGENTS.md` — tu configuración personal, nunca se commitea
-- `.browser-profile/` — sesiones del navegador, local
-- `.pi/` — configuración y sesiones del agente, local
-
-Sin nube. Sin telemetry. Sin backend. Todo en tu máquina.
-
-## Hecho con
-
-- [Pi](https://pi.dev) — motor del agente
-- [Pigram](https://github.com/galiprandi/pigram) — bridge de Telegram
-- [Playwright](https://playwright.dev) — automatización del navegador
+- Your favorite agent — [Devin](https://devin.ai), [Claude Code](https://claude.com/product/claude-code), [OpenCode](https://opencode.ai), etc.
+- [acp-connector](https://github.com/galiprandi/acp-connector) — optional Telegram/Discord bridge
+- [Playwright](https://playwright.dev) — browser automation

@@ -10,7 +10,7 @@ node_modules/
 # VitePress build output
 docs/.vitepress/dist/
 docs/.vitepress/cache/
-# User's personal agent config (copied from AGENTS.example.md on init)
-AGENTS.md
-# pi local config (pigram token, state, etc.)
-.pi/
+# acp-connector config (Telegram/Discord bot tokens)
+acp-connector.jsonc
+# Local state
+.assistant/

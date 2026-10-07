@@ -3,12 +3,15 @@
   "private": true,
   "description": "Agent home repo — identity, skills, and tooling",
   "scripts": {
+    "connect": "npx --yes acp-connector",
+    "connect:setup": "npx --yes acp-connector setup",
+    "daemon": "npx --yes pm2 start \"npx --yes acp-connector\" --name assistant-bridge && npx --yes pm2 save",
+    "daemon:stop": "npx --yes pm2 stop assistant-bridge",
+    "daemon:logs": "npx --yes pm2 logs assistant-bridge",
+    "update": "git pull && npx --yes skills update -y",
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs"
-  },
-  "dependencies": {
-    "@earendil-works/pi-coding-agent": "0.84.4"
   },
   "devDependencies": {
     "vitepress": "^1.6.3"
