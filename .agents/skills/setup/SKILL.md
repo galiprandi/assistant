@@ -17,7 +17,7 @@ This skill runs the **first time** a user opens the assistant repo. It guides an
 
 ## When to use
 
-- **Trigger:** The `## Agent Profile` section in `AGENTS.md` contains "_Not configured yet — run setup._" in any subsection (i.e., setup has not been run yet).
+- **Trigger:** `agent/profile/identity.md` does not exist or is empty in any subsection (i.e., setup has not been run yet).
 - **Run once:** After setup completes, this skill should not run again unless the user explicitly requests reconfiguration.
 
 ## Prerequisites
@@ -38,7 +38,7 @@ Ask the user:
 
 > Who are you? Tell me a bit about yourself — name, what you do, and any context that helps me work better for you.
 
-Let the user describe freely. Capture at minimum: name, occupation/role, and any relevant context (industry, location, language preferences, working style). Save as `## Agent Profile → User` in `AGENTS.md`.
+Let the user describe freely. Capture at minimum: name, occupation/role, and any relevant context (industry, location, language preferences, working style). Save to `agent/profile/user.md`.
 
 ### Step 2 — Core function
 
@@ -53,7 +53,7 @@ Examples to offer:
 - Sales/CRM (track contacts, follow-ups, pipeline)
 - Custom (describe your use case)
 
-Save the answer. This becomes the `## Agent Profile → Function` section in `AGENTS.md`.
+Save to `agent/profile/function.md`.
 
 ### Step 3 — Expectations
 
@@ -61,7 +61,7 @@ Ask:
 
 > What specific outcomes do you expect from the agent? What does success look like?
 
-Let the user describe freely. Summarize into 3-5 bullet points. Save as `## Agent Profile → Expectations` in `AGENTS.md`.
+Let the user describe freely. Summarize into 3-5 bullet points. Save to `agent/profile/expectations.md`.
 
 ### Step 4 — Autonomy limits
 
@@ -73,7 +73,7 @@ Offer defaults:
 - **Autonomous:** read emails, create tasks, search, summarize, browse
 - **Needs confirmation:** send messages/emails, modify calendar events, delete data, post publicly, make payments
 
-Let the user customize. Save as `## Agent Profile → Autonomy` in `AGENTS.md`.
+Let the user customize. Save to `agent/profile/autonomy.md`.
 
 ### Step 5 — Notification channels
 
@@ -88,7 +88,7 @@ Options:
 - In-app only (agent-desk dashboard)
 - None
 
-Save as `## Agent Profile → Notifications` in `AGENTS.md`.
+Save to `agent/profile/notifications.md`.
 
 ### Step 6 — Availability
 
@@ -98,7 +98,7 @@ Ask:
 
 If active hours: ask for start/end times and timezone.
 
-Save as `## Agent Profile → Availability` in `AGENTS.md`.
+Save to `agent/profile/availability.md`.
 
 ### Step 7 — Tone and persona
 
@@ -163,38 +163,29 @@ agentAPI.config.set("notificationChannels", [<channels from step 5>])
 agentAPI.config.set("availability", {active: true/false, start: "...", end: "...", timezone: "..."})
 agentAPI.config.set("communicationStyle", {<profile from step 7>})
 agentAPI.config.set("connectedApps", [<apps from step 8>])
+agentAPI.config.set("agentName", "<chosen agent name>")
+agentAPI.config.set("agentIdentity", "<identity summary: role + personality>")
 agentAPI.config.set("setupComplete", true)
 
 # Create setup tasks
 agentAPI.tasks.create({title: "Complete onboarding review", priority: "medium", tags: ["setup"]})
 ```
 
-### Step 11 — Persist to AGENTS.md
+### Step 11 — Persist to agent/profile/
 
-Write the `## Agent Profile` section to `AGENTS.md` with all the collected information:
+Write the profile to files under `agent/profile/` (`identity.md`, `user.md`, `function.md`, `expectations.md`, `autonomy.md`, `notifications.md`, `availability.md`, `communication-style.md`, `apps.md`) with all the collected information. `identity.md` holds the agent name + personality summary. Also ensure the desk mirrors the identity via `agentAPI.config.set("agentName", ...)` / `("agentIdentity", ...)` above.
 
-```markdown
-## Agent Profile
-
-### User
-<name, role, context from step 1>
-
-### Function
-<step 2 answer>
-
-### Expectations
-- <bullet 1>
-- <bullet 2>
-...
-
-### Autonomy
-**Autonomous:**
-- <item>
-**Needs confirmation:**
-- <item>
-
-### Notifications
-- <channel>
+```text
+agent/profile/
+├── identity.md            # agent name + personality summary
+├── user.md                # <name, role, context from step 1>
+├── function.md            # <step 2 answer>
+├── expectations.md        # <bullets>
+├── autonomy.md            # autonomous / needs-confirmation lists
+├── notifications.md       # <channels>
+├── availability.md        # <schedule>
+├── communication-style.md # <style profile>
+└── apps.md                # <connected apps>
 
 ### Availability
 <active hours or 24/7>
@@ -227,18 +218,18 @@ If any are missing, add them.
 
 **Check 2 — AGENTS.md privacy decision:**
 
-`AGENTS.md` is tracked by the upstream repo. After setup, its `## Agent Profile` section contains the user's identity, autonomy rules, connected apps, and communication style. If the user pushes this repo anywhere public, all of that is public.
+`agent/` is tracked by default. After setup, `agent/profile/` contains the user's identity, autonomy rules, connected apps, and communication style. If the user pushes this repo anywhere public, all of that is public.
 
 Ask the user:
 
-> Your AGENTS.md will now contain your personal profile. If you push this repo to a public remote, that information will be public. How do you want to handle this?
+> Your `agent/` folder will now contain your personal profile. If you push this repo to a public remote, that information will be public. How do you want to handle this?
 
 Options:
 - **Keep it local** — don't push at all (default; simplest and safest)
 - **Private repo** — push to a private GitHub repo only
 - **Accept public** — the user understands and accepts that their profile will be public
 
-Note: `AGENTS.md` must stay tracked — upstream updates rely on it (the `## Agent Profile` section is never touched upstream, so pulls merge cleanly). Do NOT gitignore or `git rm --cached` it — a later `git pull` would restore it as tracked anyway and could silently publish the profile on the next push.
+Note: `AGENTS.md` stays tracked (it contains no personal data — only the data map and rules). The personal data lives in `agent/profile/`; if the user chooses privacy, add `agent/` to `.gitignore` or push only to a private remote. The folder still functions locally whether tracked or not.
 
 **Check 3 — No secrets staged:**
 
