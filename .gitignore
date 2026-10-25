@@ -1,4 +1,6 @@
 .browser-profile/
+downloads/
+screenshots/
 .playwright-cli/
 .playwright-mcp/
 *.state.json

@@ -2,7 +2,7 @@
 
 A **self-contained home for your AI agent**. Bring your own agent (Devin, Claude Code, OpenCode, Codex, Gemini CLI — anything that speaks [ACP](https://agentclientprotocol.com/)) — this repo gives it an identity, a real browser, task management, and session continuity. Optionally bridge it to Telegram or Discord so you can chat from your phone.
 
-Powered by your agent + [acp-connector](https://github.com/galiprandi/acp-connector) (optional Telegram/Discord bridge) + [Playwright](https://playwright.dev) (browser automation).
+Powered by your agent + [acp-connector](https://github.com/galiprandi/acp-connector) (optional Telegram/Discord bridge) + [agent-browser](https://github.com/vercel-labs/agent-browser) (browser automation).
 
 ## Create a new agent
 
@@ -130,7 +130,7 @@ npm run update         Pull repo updates (git pull) + update skills
 
 ### Installed from `galiprandi/skills` (maintained)
 
-- **browser-automation** — control a browser via playwright-cli (navigate, fill forms, read content, call internal site APIs)
+- **browser-automation** — control a browser via agent-browser (navigate, fill forms, read content, call internal site APIs)
 - **agent-desk** — dashboard with sync API for tasks, events, sessions, and config
 - **android-automation** — control an Android device via adb
 
@@ -196,11 +196,12 @@ Each agent runs as an isolated container with its own browser, its own data, and
 
 **What persists (mount as a volume):**
 - `.browser-profile/` — browser sessions (cookies, localStorage, IndexedDB → includes agent-desk data)
-- `.playwright/` — playwright-cli workspace marker (required for per-repo session isolation — see below)
+- `agent-browser.json` — browser contract (auto-created by the wrapper on first run: per-repo daemon namespace + `.browser-profile/` path — see below)
 - `acp-connector.jsonc` — bridge config (bot tokens), if using Telegram/Discord
 - Your agent's own session/config dirs (e.g. `~/.claude`, `~/.config/devin`)
 
-**Why `.playwright/` matters (multi-agent setups):** playwright-cli isolates sessions per *workspace*, detected by walking up from the cwd looking for a `.playwright` directory. Without it, the workspace resolves to the CLI package root — so **every agent repo without the marker shares a single "default" session and ends up driving whichever browser is already running** (a different agent's profile, logins and all). The marker (plus a small `cli.config.json` inside) gives each repo its own daemon socket and its own `.browser-profile`. Never delete it.
+**Why `agent-browser.json` matters (multi-agent setups):** agent-browser isolates its daemon per *namespace*. The wrapper sets the namespace to the repo folder name — without it, every repo would share the single "default" daemon socket and end up driving whichever browser is already running (a different agent's profile, logins and all). The file (auto-created on first `browser.js` run from `scripts/agent-browser.template.json`) gives each repo its own daemon socket, its own `.browser-profile`, downloads and screenshots folders. Never delete it.
+
 
 **What's configured per-agent:**
 - The agent CLI you install and its auth — that's your agent's concern, not this repo's
@@ -235,12 +236,12 @@ assistant/
 ├── LICENSE                     # MIT
 ├── package.json                # npm scripts: connect, daemon, update (+ docs tooling)
 ├── .gitignore                  # Ignores .browser-profile/, acp-connector.jsonc, etc.
-├── .playwright/                # playwright-cli workspace marker — REQUIRED for per-repo session isolation
+├── agent-browser.json           # browser contract — per-repo daemon isolation (auto-created)
 │   └── cli.config.json         # browser channel, timeouts, ad/tracker blocking
 ├── skills-lock.json            # Lock file for skill versions
 ├── .agents/
 │   └── skills/
-│       ├── browser-automation/ # Browser control via playwright-cli
+│       ├── browser-automation/ # Browser control via agent-browser
 │       │   ├── SKILL.md
 │       │   ├── scripts/browser.js
 │       │   ├── references/     # golden-rules, api-capture, etc.

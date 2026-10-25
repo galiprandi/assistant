@@ -11,13 +11,13 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "android-automation/SKILL.md",
-      "computedHash": "0dce670b709017540cdf81d09265ffb8b79a27e2d61bc3f21144f0894d580bcb"
+      "computedHash": "0ca5900239be747582a607a1f52db3af37f6cf2bc024115600e45aa8275b49d4"
     },
     "browser-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "8538fa573adf391df675e290915e6c32de10928f796007bfd548e2864cac5fc1"
+      "computedHash": "ebbe3b3d1c255824a322170f4af67e1a1c173a7ed8435517cf21537cd0249a90"
     }
   }
 }

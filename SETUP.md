@@ -72,14 +72,14 @@ Install the browser used by the browser-automation skill (~150MB, warn the
 user it may take a moment):
 
 ```bash
-npm install -g @playwright/cli@latest
-playwright-cli install-browser
+npm install -g agent-browser
+# system Chrome (google-chrome or chromium) must also be installed
 ```
 
-The `.playwright/` marker directory already ships in the repo — it makes
-playwright-cli isolate this agent's session in `.browser-profile/`. Never
-delete it; without it the browser session could attach to another agent's
-profile on the same machine.
+The wrapper auto-creates `agent-browser.json` in the repo root on first run —
+it isolates this agent's browser daemon and profile per repo (namespace +
+`.browser-profile/`). Never delete it; without it the browser session could
+attach to another agent's daemon on the same machine.
 
 ### 4. Install skills
 

@@ -9,6 +9,13 @@
 > Recent template changes. Review this section after each `npm run update`
 > and decide what to adopt in your Agent Profile or workflow.
 
+### 2026-10-25
+- **Browser backend migrated to agent-browser** (Vercel): playwright-cli is
+  replaced. `.playwright/` marker no longer needed — per-repo isolation now
+  comes from `namespace` in `agent-browser.json` (auto-created by the wrapper
+  on first run). Semantic-first doctrine: shortcuts → `find` → `snapshot -i`
+  refs → `eval` last resort. Downloads go to `downloads/`, screenshots to
+  `screenshots/` (both gitignored).
 ### 2026-10-07
 - **`./Assistant` script removed**: no more bash helper. Everything is either
   agent-driven (SETUP.md, setup skill) or an npm script: `npm run connect`
@@ -135,7 +142,7 @@ You have the following skills installed. Use them as your primary tools.
 
 ### browser-automation
 
-**Purpose:** Control a browser via playwright-cli. Navigate sites, fill forms, read content, interact with web apps.
+**Purpose:** Control a browser via agent-browser. Navigate sites, fill forms, read content, interact with web apps.
 
 **Location:** `.agents/skills/browser-automation/SKILL.md`
 
@@ -292,12 +299,12 @@ assistant/
 ├── LICENSE                            # MIT
 ├── package.json                       # npm scripts: connect, daemon, update
 ├── .gitignore                         # Ignores browser profile, bot tokens, state
-├── .playwright/                       # playwright-cli workspace marker — session isolation
+├── agent-browser.json                   # browser contract — per-repo daemon isolation (auto-created by wrapper)
 ├── acp-connector.jsonc                # Bridge config (gitignored, optional)
 ├── skills-lock.json                   # Lock file for maintained skill versions
 ├── .agents/
 │   └── skills/
-│       ├── browser-automation/        # Browser control via playwright-cli
+│       ├── browser-automation/        # Browser control via agent-browser
 │       │   ├── SKILL.md
 │       │   ├── scripts/browser.js
 │       │   ├── references/            # golden-rules, api-capture, etc.
