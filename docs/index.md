@@ -118,4 +118,4 @@ No cloud. No telemetry. No backend. Everything on your machine.
 
 - Your favorite agent — [Devin](https://devin.ai), [Claude Code](https://claude.com/product/claude-code), [OpenCode](https://opencode.ai), etc.
 - [acp-connector](https://github.com/galiprandi/acp-connector) — optional Telegram/Discord bridge
-- [Playwright](https://playwright.dev) — browser automation
+- [agent-browser](https://github.com/vercel-labs/agent-browser) — browser automation
