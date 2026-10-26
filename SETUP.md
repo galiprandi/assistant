@@ -100,7 +100,9 @@ At the end it will also offer, optionally:
 - **Phone control (connect)** — the agent opens Telegram Web or Discord in
   its own browser, the user only logs in, and the agent obtains the bot
   token and writes `acp-connector.jsonc` itself. The user does nothing else.
-  Test it with `npm run connect`.
+  Test it with `npm run connect`. If connected, also install the connector
+  skill so the agent knows the reminder/cron MCP tools:
+  `npx skills add galiprandi/skills/acp-connector`.
 - **Always-on** — run the bridge as a daemon so the agent stays reachable
   after reboots: `npm run daemon` (pm2 via npx), then `npx pm2 startup`
   for the OS-level service and `npx pm2 save`. Manage with
