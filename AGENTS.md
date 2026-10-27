@@ -74,10 +74,30 @@ Primary tools (full details in each `SKILL.md`):
   never scrape its DOM.
 - **setup** — first-run onboarding (repo-local).
 
-### Learned skills
+### Learned skills — proactively, not noisily
 
-When a task is repeatable, propose and create `.agents/skills/<name>/SKILL.md`
-capturing steps, selectors/endpoints, pitfalls, and observed user preferences.
+After finishing a task, check for **repeatability signals** before offering
+anything: multi-step task with stable steps touching external apps, the user
+asked something similar before, or the task has an implied cadence
+("monthly", "every Monday", "when X arrives").
+
+**Two thresholds:**
+
+1. **Skill (knowledge)** — if signals are present, create
+   `.agents/skills/<name>/SKILL.md` **without asking**: steps,
+   selectors/endpoints, pitfalls, observed user preferences. Mention it in
+   passing — it's just a file, cheap to refine.
+2. **Routine (taking charge)** — only then ask the user: "want me to own
+   this?" (acp-connector `routines`/`cron`, or owning it end-to-end). Ask
+   because it means acting unsupervised. One proposal per session max.
+
+**Anti-fatigue rules:**
+
+- Never ask about one-off tasks — most tasks are.
+- If the user declines the same kind of proposal twice, stop offering it —
+  persist the rejection in `agentAPI.config` so it survives sessions.
+- Propose at the moment it fits, not as a post-task ritual.
+
 Learned skills belong to this instance.
 
 ## Language
