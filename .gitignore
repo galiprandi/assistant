@@ -18,3 +18,7 @@ acp-connector.jsonc
 uploads/
 # Local state
 .assistant/
+
+# Local agent config
+.devin/
+.claude/

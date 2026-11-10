@@ -1,23 +1,23 @@
 {
-  "version": 1,
+  "version": 2,
   "skills": {
     "agent-desk": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "agent-desk/SKILL.md",
-      "computedHash": "9aa0992c4b0357b51f97d79577519cb6497f018d8cad770c70f1fb90c471fd05"
+      "computedHash": "fcaba34d6aecd1193a7db9bf16670e7addb60ef3acbd1a4552b4180e25caef63"
     },
     "android-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "android-automation/SKILL.md",
-      "computedHash": "0ca5900239be747582a607a1f52db3af37f6cf2bc024115600e45aa8275b49d4"
+      "computedHash": "aa4ff988f338b8c4c3b3efd7ac57fa00afc8dcd678c2590f0f11dad0ef6da357"
     },
     "browser-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "ebbe3b3d1c255824a322170f4af67e1a1c173a7ed8435517cf21537cd0249a90"
+      "computedHash": "32f6ef98738577ee6305d4a699198cecb7a816b7fd8d508e53ead15cb446b475"
     }
   }
 }
