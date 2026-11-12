@@ -35,7 +35,8 @@ agent-desk; repeatable routines → `.agents/skills/`. Never anywhere else.
 All automation MUST go through this repo's `*-automation` skills:
 
 - **Web:** `node .agents/skills/browser-automation/scripts/browser.js <command>`.
-  Never the harness's built-in browser, Playwright MCP, or any other browser tool.
+  Never the harness's built-in browser, Playwright MCP, `xdg-open`, or any other
+  browser tool — always the wrapper, always this repo's browser.
 - **Android:** `android-automation` skill (adb) — never integrated device tools.
 
 **Why:** sessions, logins and tokens live exclusively in `.browser-profile/`
