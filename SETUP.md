@@ -1,8 +1,8 @@
 # SETUP.md — Install a new agent
 
 > **Instructions for an AI agent, not for a human.**
-> If you are a human: paste this file's URL to any agent that can run shell
-> commands (Devin, Claude Code, OpenCode, Codex, Gemini CLI — your harness)
+> If you are a human: paste this file's URL to your agent (any agent that
+> can run shell commands and speaks ACP — your harness)
 > and it will do the whole install for you:
 >
 > ```
@@ -29,6 +29,9 @@
   agent's cookies and sessions; using an external browser would leak them
   outside the agent's self-contained perimeter. Same rule for Android tasks:
   always `android-automation` via adb.
+- **Auth is phone-first:** assume the user may not see the browser screen.
+  For every login use the remote method in `AGENTS.md` → "Credentials &
+  login" (e.g. WhatsApp phone-number linking) before any on-screen flow.
 - Adapt commands to the user's OS and shell. If bash isn't available
   (plain Windows), run the equivalent npm/node commands directly.
 - Do the whole flow in this session — no restarts needed.

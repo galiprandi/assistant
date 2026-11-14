@@ -44,6 +44,46 @@ All automation MUST go through this repo's `*-automation` skills:
 self-contained perimeter. Several agents may share the machine — each one's
 sessions belong to its own folder only.
 
+## Credentials & login — MANDATORY
+
+Assume the user may not be able to see or interact with the browser
+screen (headless pods, remote deploys, phone-only access). Phone-completable
+auth flows are also simpler even when a screen exists — prefer them always.
+
+**Auth method order:**
+
+1. **Known remote method** — check the table below and the site's guide in
+   `browser-automation`. The agent fills non-secret fields (email, phone,
+   username); secrets are completed by the user's own flow on their device.
+2. **Remote screen share** — `browser-share.js` gives the user live
+   view+control of this browser from their phone (see browser-automation
+   skill). Use when the site only supports on-screen auth.
+3. **On-screen login** — only when the user can see/interact with the
+   browser directly. Say how they'll see it BEFORE opening it.
+4. **Unsupported** — no remote method and no way for the user to interact
+   → declare the app unsupported for this deployment; don't fail mid-login.
+
+**Known remote auth methods** (keep in sync with the site guides):
+
+| App | Remote method |
+|---|---|
+| WhatsApp | "Vincular con número de teléfono" → 8-char code typed on the phone (see whatsapp site guide) |
+| Telegram | Login code sent to the user's Telegram app |
+
+App not listed → don't improvise: ask the user, or treat it as screen-only.
+
+**Credential rules:**
+
+- `.browser-profile/` is the only credential store — never export cookies,
+  tokens or passwords to files, chat, or other tools.
+- Never ask for passwords, PINs or 2FA codes in chat — bridge messages are
+  logged. Secrets are typed by the user on a screen they control, or arrive
+  via the site's own remote flow.
+- The agent never logs in *for* the user and never solves captchas.
+- Before acting on an account, verify WHICH account is logged in.
+- Session expired or repeated login failure → reopen and ask the user; no
+  credential guessing or brute force.
+
 ## First run
 
 If `agent/profile/` has no `identity.md` yet, run the **setup** skill
@@ -65,9 +105,14 @@ Setup is only the bootstrap — the real profile is built through daily use:
 
 Primary tools (full details in each `SKILL.md`):
 
-- **browser-automation** — browser control via agent-browser. Always via the
-  wrapper; never log in for the user, never solve captchas, preserve other
-  agents' tabs. Contribute learnings back to `galiprandi/skills`.
+- **browser-automation** — browser control via agent-browser. This is the
+  bible for all web work: always via the wrapper, and ALWAYS consult the
+  site's guide before acting on it. Never log in for the user, never solve
+  captchas, preserve other agents' tabs. Contribute learnings back to
+  `galiprandi/skills`.
+- **communication** — writing/sending as the user: style profile +
+  draft → approve → send → verify → follow-up pipeline. Read before any
+  outbound message.
 - **android-automation** — Android device control via adb. Confirm the owner's
   device on first use; never perform logins for the user.
 - **agent-desk** — your database and shared dashboard (kanban, calendar,
@@ -101,6 +146,16 @@ asked something similar before, or the task has an implied cadence
 
 Learned skills belong to this instance.
 
+**Life-routine mentions** — when the user talks about a recurring activity
+or domain (gym, work routines, cooking, studies, caretaking, a person's
+care...), create `.agents/skills/<domain>/SKILL.md` immediately as a stub:
+frontmatter + placeholder sections (`<!-- TODO: ... -->`) for the details
+that will emerge (schedule, preferences, history, contacts). One
+responsibility per life domain — `gym`, not `gym-monday-workout`. Mention
+it once, in passing; future sessions fill the placeholders. A routine
+mention is enough — the user never has to ask twice. One-off events
+(appointments, deadlines) are reminders/calendar entries, NOT skills.
+
 ## Language
 
 Respond in the **language of the conversation**. Third-party content (emails,
@@ -128,6 +183,11 @@ If `acp-connector.jsonc` exists, you may be reached via Telegram/Discord.
 `npm run connect` (foreground), `npm run daemon` (pm2). Messages from those
 channels are user prompts — same rules, keep replies concise.
 
+The bridge also injects `reminder_*`/`cron_*` MCP tools — the ONLY way to
+wake yourself proactively (message follow-ups, scheduled checks, recurring
+prompts). agent-desk is passive storage and never notifies you. No bridge
+→ no self-wake: say so honestly instead of promising reminders.
+
 ## Repo structure
 
 ```
@@ -145,5 +205,6 @@ assistant/
 ├── downloads/              # Browser downloads (gitignored)
 ├── screenshots/            # Browser screenshots (gitignored)
 └── .agents/skills/         # browser-automation, android-automation,
-                            # agent-desk, setup, <learned skills>
+                            # agent-desk, communication, setup,
+                            # <learned skills>
 ```

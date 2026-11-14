@@ -24,7 +24,7 @@ features:
     details: Run your assistant from your phone with a Telegram or Discord bot. Or use it from your IDE. Your call.
     icon: 💬
   - title: Your favorite agent
-    details: Works with any agent that can run shell commands: Devin, Claude Code, OpenCode, Codex, Gemini CLI. The repo is the identity — the agent is your choice.
+    details: Works with any agent that can run shell commands and speaks ACP. The repo is the identity — the agent is your choice.
     icon: 🧠
   - title: Multi-assistant
     details: Each assistant is just a folder. Run several isolated assistants on the same machine, each with its own browser, bots and data.
@@ -38,15 +38,11 @@ features:
 
 Assistant is a home for your personal agent: a repo holding its identity, its skills and its memory. Show it a task once (reply on WhatsApp, send an email, download a report from some site) and next time you just say "do the usual" and it does it.
 
-It doesn't ship its own agent — you bring the one you already use (Devin, Claude Code, OpenCode, any agent that can run shell commands). The repo provides the identity; the agent is replaceable.
+It doesn't ship its own agent — you bring the one you already use (any agent that can run shell commands and speaks ACP). The repo provides the identity; the agent is replaceable.
 
 ## What you need
 
-- **An agent that can run commands** — that's the only requirement. The agent installs everything else:
-  - [Devin](https://devin.ai)
-  - [Claude Code](https://claude.com/product/claude-code) (Anthropic)
-  - [OpenCode](https://opencode.ai) (open source)
-  - Codex, Gemini CLI, or any other agent with a terminal
+- **An agent that can run commands and speaks ACP** — that's the only requirement. The agent installs everything else
 - **Telegram or Discord** (optional) — only if you want to control it from your phone
 
 ## Getting started
@@ -76,7 +72,7 @@ Open your assistant's folder with your IDE of choice and keep talking. The folde
 
 ### 4. Connect it to Telegram or Discord (optional)
 
-At the end of onboarding the agent asks if you want phone control. If you say yes, **it does everything**: opens Telegram Web or the Discord Developer Portal in its own browser, you only log in, and it creates the bot, grabs the token and writes `acp-connector.jsonc` (gitignored). Message your bot and the assistant replies.
+At the end of onboarding the agent asks if you want phone control. If you say yes, **it does everything**: opens Telegram Web or the Discord Developer Portal in its own browser and prefers logins that complete on your phone (like WhatsApp's 8-char link code — no screen needed), and it creates the bot, grabs the token and writes `acp-connector.jsonc` (gitignored). Message your bot and the assistant replies.
 
 You can also enable it anytime later — just ask: *"connect me to Telegram"*.
 

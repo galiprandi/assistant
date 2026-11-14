@@ -1,7 +1,7 @@
 ---
 name: setup
-version: "1.0.0"
-description: First-run onboarding skill. Guides the user through defining their identity, the agent's role, autonomy limits, notification channels, availability, tone/persona, and app access. Runs only once during initial setup.
+version: "1.1.0"
+description: First-run onboarding skill. Runs as a guided conversation — infers the user's work/personal context, configures identity, autonomy, channels, tone, and app access with phone-first auth, and seeds routine-skill stubs. Runs only once; onboarding continues through daily use.
 allowed-tools: Bash(*) Read(*) Write(*) Edit(*) Glob(*) Grep(*)
 metadata:
   author: galiprandi
@@ -30,108 +30,67 @@ This skill runs the **first time** a user opens the assistant repo. It guides an
 
 ## Flow
 
-Run each step in order. Ask the user one question at a time. Wait for their answer before proceeding. Keep the conversation in the user's language — detect it from their first message.
+Run each step in order. Steps 1-7 are **one continuous conversation** — never one question per step; extract answers from free text and only ask for what's missing. Keep everything in the user's language — detect it from their first message.
 
-### Step 1 — User identity
+### Steps 1-3 — The conversation (not a questionnaire)
 
-Ask the user:
+Run the identity part as **one guided conversation**: 2-3 short exchanges,
+not one question per step. Extract everything you can from free answers;
+only ask for what's missing. The user should feel they're chatting.
+Onboarding does NOT end here — it continues through daily use (see
+"Post-setup").
 
-> Who are you? Tell me a bit about yourself — name, what you do, and any context that helps me work better for you.
+**Step 1 — Who is the user.** Ask openly: "Tell me about yourself — your
+name, what you do, how I can help." Capture name, phone, email,
+occupation/role, and context (industry, location, language, working
+style). Save to `agent/profile/user.md`.
 
-Let the user describe freely. Capture at minimum: name, occupation/role, and any relevant context (industry, location, language preferences, working style). Save to `agent/profile/user.md`.
+**Step 2 — Work, personal, or both.** Ask what they'll use the agent for.
+From the answer **infer** the function and the apps they need (dentist →
+appointments/reminders; accountant → taxes/deadlines; etc.) and propose
+them — the user adjusts, never starts from zero. Save to
+`agent/profile/function.md`.
 
-### Step 2 — Core function
+**Step 3 — Expectations + autonomy.** Fold into the same conversation:
+what does success look like, and what may you do alone vs. confirm first.
+Offer sensible defaults (autonomous: read, create tasks, search, browse;
+needs confirmation: send messages, modify events, delete, post publicly,
+pay) and let the user tweak — don't interrogate. Save to
+`agent/profile/expectations.md` + `autonomy.md`.
 
-Ask the user:
+### Step 4 — Notifications + availability
 
-> What is your agent's primary function? What do you expect it to do for you?
+Still inside the same conversation: which channels should the agent notify
+on (WhatsApp — linked by phone-number code, no screen needed; email;
+Discord; in-app only; none), and active hours or 24/7. Offer defaults;
+ask only if the context makes it matter. Save to
+`agent/profile/notifications.md` + `availability.md`.
 
-Examples to offer:
-- Personal assistant (email, calendar, messages)
-- Project manager (track tasks, deadlines, dependencies)
-- Research assistant (gather, summarize, organize information)
-- Sales/CRM (track contacts, follow-ups, pipeline)
-- Custom (describe your use case)
+### Step 5 — Tone
 
-Save to `agent/profile/function.md`.
+Offer "mimic me" as the default once message sources are connected — the
+`communication` skill refines the style profile from real samples during
+use. Alternatives: own persona, or hybrid. Save the choice; details live
+in `agent/profile/communication-style.md` and get filled continuously,
+never via a form.
 
-### Step 3 — Expectations
+### Step 6 — Routine stubs
 
-Ask:
+While chatting, listen for recurring activities or life domains (gym,
+work routines, studies, caretaking, a person's care...). For each one,
+create `.agents/skills/<domain>/SKILL.md` as a placeholder stub — see
+"Life-routine mentions" in `AGENTS.md`. Mention each stub once, in
+passing. This is how the profile grows from day one: non-invasively.
 
-> What specific outcomes do you expect from the agent? What does success look like?
+### Step 7 — App access
 
-Let the user describe freely. Summarize into 3-5 bullet points. Save to `agent/profile/expectations.md`.
-
-### Step 4 — Autonomy limits
-
-Ask:
-
-> What can the agent do on its own without asking, and what requires your confirmation?
-
-Offer defaults:
-- **Autonomous:** read emails, create tasks, search, summarize, browse
-- **Needs confirmation:** send messages/emails, modify calendar events, delete data, post publicly, make payments
-
-Let the user customize. Save to `agent/profile/autonomy.md`.
-
-### Step 5 — Notification channels
-
-Ask:
-
-> How should the agent notify you? Which channels?
-
-Options:
-- WhatsApp (requires WhatsApp Web login)
-- Email (requires Gmail/Outlook login)
-- Discord (requires Discord login)
-- In-app only (agent-desk dashboard)
-- None
-
-Save to `agent/profile/notifications.md`.
-
-### Step 6 — Availability
-
-Ask:
-
-> Does the agent have active hours, or should it be available 24/7?
-
-If active hours: ask for start/end times and timezone.
-
-Save to `agent/profile/availability.md`.
-
-### Step 7 — Tone and persona
-
-Ask:
-
-> Do you want the agent to mimic your communication style (by reading your past messages/emails), or should it adopt its own persona?
-
-Options:
-- **Mimic me:** The agent reads sample conversations/emails to learn the user's tone, vocabulary, and style. It writes as if it were the user.
-- **Own persona:** The agent adopts a neutral, professional tone distinct from the user.
-- **Hybrid:** The agent uses its own persona but adjusts formality/language to match the user's context.
-
-If the user chooses "Mimic me":
-1. Ask which sources to read (Gmail sent folder, WhatsApp chats, etc.)
-2. Use `browser-automation` to navigate to those sources
-3. Analyze tone, vocabulary, sentence structure, formality level
-4. Save a `## Communication Style` profile in `AGENTS.md` with:
-   - Language(s) used
-   - Formality level (1-5)
-   - Common phrases / expressions
-   - Average sentence length
-   - Emoji usage (yes/no, which ones)
-   - Greeting/sign-off style
-
-### Step 8 — App access
-
-Based on the core function (Step 2) and notification channels (Step 5), determine which apps the agent needs access to. For each app:
-
-1. Tell the user: "I need access to [app name]. I'll open it in the browser — please log in."
-2. Use `browser-automation` to open the app URL in a new tab
-3. Wait for the user to log in (do NOT log in for them — golden rule)
-4. Verify login succeeded (check for logged-in indicators)
-5. Confirm with the user
+Connect only the apps inferred in Step 2 plus the chosen notification
+channels. First ask once: **"When it's time to log in, will you be in
+front of this machine's screen, or phone-only (remote)?"** — save the
+answer in `agent/profile/`. Then per app, follow "Credentials & login" in
+`AGENTS.md`: check the known remote method first (agent fills non-secret
+fields, user completes secrets on their phone), never passwords in chat,
+never log in for them, verify login and confirm.
 
 Common apps by function:
 - Personal assistant: Gmail, Google Calendar, WhatsApp, Outlook
@@ -139,14 +98,14 @@ Common apps by function:
 - Sales/CRM: Gmail, LinkedIn, WhatsApp
 - Research: Google, any specific databases
 
-### Step 9 — Browser homepage
+### Step 8 — Browser homepage
 
 1. Create the browser profile at `.browser-profile/` if it doesn't exist
 2. Set the homepage to the agent-desk URL
 3. Open the browser and verify agent-desk loads
 4. Verify `window.agentAPIReady === true`
 
-### Step 10 — Persist to agent-desk
+### Step 9 — Persist to agent-desk
 
 Using `agent-desk` skill (via `eval`):
 
@@ -159,10 +118,10 @@ agentAPI.config.set("user", {name: "<name>", role: "<role>", context: "<context>
 agentAPI.config.set("agentFunction", "<function from step 2>")
 agentAPI.config.set("agentExpectations", [<bullet points from step 3>])
 agentAPI.config.set("agentAutonomy", {autonomous: [...], needsConfirmation: [...]})
-agentAPI.config.set("notificationChannels", [<channels from step 5>])
+agentAPI.config.set("notificationChannels", [<channels from step 4>])
 agentAPI.config.set("availability", {active: true/false, start: "...", end: "...", timezone: "..."})
-agentAPI.config.set("communicationStyle", {<profile from step 7>})
-agentAPI.config.set("connectedApps", [<apps from step 8>])
+agentAPI.config.set("communicationStyle", {<profile from step 5>})
+agentAPI.config.set("connectedApps", [<apps from step 7>])
 agentAPI.config.set("agentName", "<chosen agent name>")
 agentAPI.config.set("agentIdentity", "<identity summary: role + personality>")
 agentAPI.config.set("setupComplete", true)
@@ -171,7 +130,7 @@ agentAPI.config.set("setupComplete", true)
 agentAPI.tasks.create({title: "Complete onboarding review", priority: "medium", tags: ["setup"]})
 ```
 
-### Step 11 — Persist to agent/profile/
+### Step 10 — Persist to agent/profile/
 
 Write the profile to files under `agent/profile/` (`identity.md`, `user.md`, `function.md`, `expectations.md`, `autonomy.md`, `notifications.md`, `availability.md`, `communication-style.md`, `apps.md`) with all the collected information. `identity.md` holds the agent name + personality summary. Also ensure the desk mirrors the identity via `agentAPI.config.set("agentName", ...)` / `("agentIdentity", ...)` above.
 
@@ -191,13 +150,13 @@ agent/profile/
 <active hours or 24/7>
 
 ### Communication Style
-<step 7 profile or "Own persona">
+<step 5 choice or "Own persona">
 
 ### Connected Apps
 - <app> — <login status>
 ```
 
-### Step 12 — Security validation
+### Step 11 — Security validation
 
 Before finishing, verify that no personal data will leak to GitHub. This is critical — the user's profile, browser data, and credentials must never be pushed.
 
@@ -241,7 +200,7 @@ Run `git status` and verify no sensitive files are staged:
 
 If any are found, remove them from staging and confirm they're gitignored.
 
-### Step 13 — Phone control (optional connect)
+### Step 12 — Phone control (optional connect)
 
 Ask the user:
 
@@ -259,8 +218,8 @@ If yes, the agent drives the whole flow — the user does nothing but log in:
    user log in, and guide/perform creating an application + bot to obtain
    the token. Ask the user to invite the bot to their server if they want
    one (or configure it to accept DMs).
-3. Ask which agent command to bridge (detect installed CLIs: `devin acp`,
-   `claude`, `opencode`, `codex`, `gemini`, ...).
+3. Ask which agent command to bridge (detect which ACP-compatible agent
+   CLI is installed on this machine).
 4. Collect the **allowed chat/channel IDs**: send a message to the new bot
    from the user's account, then fetch `getUpdates` with the token
    (Telegram) or read the channel ID from Discord (user enables Developer
@@ -274,7 +233,7 @@ If yes, the agent drives the whole flow — the user does nothing but log in:
 ```jsonc
 {
   // Per-instance values — MUST be correct when several agents share a machine:
-  "agentCmd": "<detected ACP command, e.g. 'devin acp --model swe-2'>",
+  "agentCmd": "<the ACP command for this agent>",
   "agentCwd": "<absolute path of THIS agent's folder>",  // never another agent's
   // REQUIRED — never omit: a stable sessionId makes acp-connector resume the
   // same agent session, so the agent keeps its context across restarts and
@@ -302,7 +261,7 @@ If yes, the agent drives the whole flow — the user does nothing but log in:
   "cron": [],
   "routines": []
   // routines are named reusable prompts — start empty; the agent proposes
-  // a few based on the chosen role at the end of setup (see step 15), e.g.:
+  // a few based on the chosen role at the end of setup (see step 14), e.g.:
   // { "name": "ws", "prompt": "Check WhatsApp for new messages, summarize them and prepare numbered draft replies so I can decide which to send" }
 }
 ```
@@ -324,7 +283,7 @@ Per-instance checklist (multi-agent machines):
 If the user declines, skip without pressure — it can be enabled any time
 later by asking the agent.
 
-### Step 14 — Always-on (optional)
+### Step 13 — Always-on (optional)
 
 If connect was configured, ask:
 
@@ -342,7 +301,7 @@ npx pm2 startup         # generates the OS service (systemd/launchd/schtasks)
 it to them exactly. Manage later with `npm run daemon:logs` and
 `npm run daemon:stop`.
 
-### Step 15 — Wrap up
+### Step 14 — Wrap up
 
 1. Tell the user setup is complete
 2. Summarize the configuration
@@ -357,9 +316,10 @@ it to them exactly. Manage later with `npm run daemon:logs` and
 
 ## Golden rules
 
-- **One question at a time** — don't overwhelm the user
+- **Conversation, not interrogation** — guided chat, extract from free answers, ask only what's missing
 - **User's language** — detect from first message, respond in same language
 - **No logins** — the agent never logs in. It opens the app and the user logs in.
+- **Phone-first auth** — prefer remote-completable login flows (link codes, push approvals) per the "Credentials & login" rules; never ask for passwords or 2FA codes in chat.
 - **No assumptions** — if the user's answer is ambiguous, ask for clarification
 - **Save everything** — persist to both AGENTS.md (core) and agent-desk (config + session)
 - **Respect privacy** — if the user declines an app or feature, skip it without pressure
@@ -373,5 +333,7 @@ After setup, the agent should:
 4. Use `agent-desk` as its control center for tasks, events, and continuity
 5. **Keep onboarding forever** — this skill is the bootstrap, not the whole
    onboarding. Every session, proactively detect and persist new user
-   preferences (see "Onboarding is continuous" in AGENTS.md): likes,
-   formats, contacts, brands, habits. The profile is never finished.
+   preferences, habits and routines (see "Onboarding is continuous" and
+   "Life-routine mentions" in AGENTS.md): likes, formats, contacts, brands,
+   habits. Recurring activities get `.agents/skills/<domain>/` stubs that
+   fill up over time. The profile is never finished.

@@ -1,12 +1,12 @@
 # assistant
 
-A **self-contained home for your AI agent**. Bring your own agent (Devin, Claude Code, OpenCode, Codex, Gemini CLI — anything that speaks [ACP](https://agentclientprotocol.com/)) — this repo gives it an identity, a real browser, task management, and session continuity. Optionally bridge it to Telegram or Discord so you can chat from your phone.
+A **self-contained home for your AI agent**. Bring your own agent (anything that speaks [ACP](https://agentclientprotocol.com/) and can run shell commands) — this repo gives it an identity, a real browser, task management, and session continuity. Optionally bridge it to Telegram or Discord so you can chat from your phone.
 
 Powered by your agent + [acp-connector](https://github.com/galiprandi/acp-connector) (optional Telegram/Discord bridge) + [agent-browser](https://github.com/vercel-labs/agent-browser) (browser automation).
 
 ## Create a new agent
 
-You need an agent that can run shell commands (Devin, Claude Code, OpenCode, Codex, Gemini CLI — anything ACP-compatible). That's the only requirement — the agent does the install.
+You need an agent that can run shell commands and speaks ACP. That's the only requirement — the agent does the install.
 
 **Paste this to your agent:**
 
@@ -38,14 +38,14 @@ After the initial setup, open the assistant's folder with your agent CLI/IDE:
 
 ```bash
 cd assistant
-devin        # or claude, opencode, ...
+your-agent        # or any other ACP-compatible CLI
 ```
 
 The agent reads `AGENTS.md` — that's its identity, skills, and rules. The folder is the assistant's home; whoever runs there becomes the assistant.
 
 ## Connect to Telegram or Discord (optional)
 
-The onboarding offers this at the end — or just ask your agent anytime: *"connect me to Telegram"*. The agent opens Telegram Web or the Discord Developer Portal **in its own browser**, you only log in, and it obtains the bot token and writes `acp-connector.jsonc` (gitignored — contains bot tokens) itself. Zero manual steps.
+The onboarding offers this at the end — or just ask your agent anytime: *"connect me to Telegram"*. The agent opens Telegram Web or the Discord Developer Portal **in its own browser** and prefers logins that complete on your phone (e.g. WhatsApp links by an 8-char code you type on your phone — no screen needed), you only handle the phone side, and it obtains the bot token and writes `acp-connector.jsonc` (gitignored — contains bot tokens) itself. Zero manual screen steps.
 
 To run the bridge manually:
 
@@ -80,7 +80,7 @@ npm run update         Pull repo updates (git pull) + update skills
 ```
 ┌─────────────────── Your machine / container ──────────────────┐
 │                                                                │
-│  Your agent CLI (devin, claude, opencode, ...)                │
+│  Your agent CLI (any ACP-compatible agent)                     │
 │     │                                                          │
 │     ▼                                                          │
 │  ┌──────────────────────────────────────────────────────────┐ │
@@ -144,7 +144,8 @@ npm run update         Pull repo updates (git pull) + update skills
 ### Repo-local
 
 - **setup** — first-run onboarding (not published, lives only in this repo)
-- **learned skills** — the agent creates new skills under `.agents/skills/` when it discovers repeatable routines, capturing the steps and your preferences
+- **communication** — writing/sending as you: style profile + draft → approve → send → verify → follow-up pipeline
+- **learned skills** — the agent creates new skills under `.agents/skills/` when it discovers repeatable routines or you mention a recurring activity, capturing the steps and your preferences
 
 ## Updating
 
@@ -198,7 +199,7 @@ Each agent runs as an isolated container with its own browser, its own data, and
 - `.browser-profile/` — browser sessions (cookies, localStorage, IndexedDB → includes agent-desk data)
 - `agent-browser.json` — browser contract (auto-created by the wrapper on first run: per-repo daemon namespace + `.browser-profile/` path — see below)
 - `acp-connector.jsonc` — bridge config (bot tokens), if using Telegram/Discord
-- Your agent's own session/config dirs (e.g. `~/.claude`, `~/.config/devin`)
+- Your agent's own session/config dirs (inside its own config home)
 
 **Why `agent-browser.json` matters (multi-agent setups):** agent-browser isolates its daemon per *namespace*. The wrapper sets the namespace to the repo folder name — without it, every repo would share the single "default" daemon socket and end up driving whichever browser is already running (a different agent's profile, logins and all). The file (auto-created on first `browser.js` run from `scripts/agent-browser.template.json`) gives each repo its own daemon socket, its own `.browser-profile`, downloads and screenshots folders. Never delete it.
 
@@ -250,10 +251,11 @@ assistant/
 │       ├── agent-desk/         # Dashboard API for tasks/events/sessions
 │       │   ├── SKILL.md
 │       │   └── references/
+│       ├── communication/      # Messaging as the user (style + pipeline)
 │       ├── setup/              # First-run onboarding (repo-local)
 │       └── <learned>/          # Skills the agent creates for repeatable routines
-└── .claude/
-    └── skills/                 # Symlinks → .agents/skills/ (for Claude Code)
+└── .claude/                  # Compatibility symlinks → .agents/skills/
+                              # (only if your harness reads this dir)
 ```
 
 ## License
