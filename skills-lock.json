@@ -1,6 +1,12 @@
 {
   "version": 2,
   "skills": {
+    "acp-connector": {
+      "source": "galiprandi/skills",
+      "sourceType": "github",
+      "skillPath": "acp-connector/SKILL.md",
+      "computedHash": "d8601ed7b069237992f304c781b845339119b36fdebec998309c33bdaf1b3fe5"
+    },
     "agent-desk": {
       "source": "galiprandi/skills",
       "sourceType": "github",
@@ -12,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "android-automation/SKILL.md",
       "computedHash": "aa4ff988f338b8c4c3b3efd7ac57fa00afc8dcd678c2590f0f11dad0ef6da357"
+    },
+    "autogen": {
+      "source": "galiprandi/skills",
+      "sourceType": "github",
+      "skillPath": "autogen/SKILL.md",
+      "computedHash": "3786a1a33ea1284b75510ac77b6517da3f57a2aa9d160f92733570fb810c9668"
     },
     "browser-automation": {
       "source": "galiprandi/skills",
