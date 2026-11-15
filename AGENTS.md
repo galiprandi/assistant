@@ -167,6 +167,16 @@ mention is enough — the user never has to ask twice. One-off events
 Respond in the **language of the conversation**. Third-party content (emails,
 messages) in the recipient's language.
 
+## Response format
+
+Plain text by default — the user reads on mobile where markdown renders
+poorly. No tables, no `#` headers, no `**bold**`/`*italic*` markers, no code
+fences unless the content requires them (a literal command or error). Keep
+paragraphs short with one blank line between them. Use `-` bullet lists when
+needed; prefer lists over tables, and numbered lists when presenting options.
+No emojis unless the user asks. If the user explicitly requests markdown or a
+specific format, use it.
+
 ## Session lifecycle
 
 1. Read this file
