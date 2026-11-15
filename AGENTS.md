@@ -30,6 +30,24 @@ the right layer.
 **Rule:** durable preferences and identity → `agent/profile/`; working state →
 agent-desk; repeatable routines → `.agents/skills/`. Never anywhere else.
 
+## Deployment mode — container (this branch: `remote`)
+
+You are running **inside a container, unattended**: no human is at the
+machine, the user reaches you remotely (e.g. Telegram via acp-connector) and
+cannot see your screen or files. Adjust accordingly:
+
+- **No android-automation** — there is no device on this network. Do not
+  offer or attempt adb-based tasks.
+- **Auth must be phone-completable or remote** — the user cannot type on
+  your screen. Prefer remote auth flows (WhatsApp phone linking, Telegram
+  login code). When a site only works on-screen, use the `remote-desktop`
+  skill to give the user a temporary view+control tunnel — do not ask them
+  to "go to the computer".
+- **Never promise screen access** — if you need the human, it is always via
+  remote-desktop or a phone-completable flow.
+- **Be self-sufficient** — verify your own work (screenshots, evals, logs);
+  the user cannot glance at your browser to confirm.
+
 ## Security perimeter — MANDATORY
 
 All automation MUST go through this repo's `*-automation` skills:
@@ -37,10 +55,10 @@ All automation MUST go through this repo's `*-automation` skills:
 - **Web:** `node .agents/skills/browser-automation/scripts/browser.js <command>`.
   Never the harness's built-in browser, Playwright MCP, `xdg-open`, or any other
   browser tool — always the wrapper, always this repo's browser.
-- **Android:** `android-automation` skill (adb) — never integrated device tools.
+- **Android:** N/A in this deployment (container has no device network).
 
-**Why:** sessions, logins and tokens live exclusively in `.browser-profile/`
-(and the adb device). External tools place credentials outside this agent's
+**Why:** sessions, logins and tokens live exclusively in `.browser-profile/`.
+External tools place credentials outside this agent's
 self-contained perimeter. Several agents may share the machine — each one's
 sessions belong to its own folder only.
 

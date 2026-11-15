@@ -13,12 +13,6 @@
       "skillPath": "agent-desk/SKILL.md",
       "computedHash": "fcaba34d6aecd1193a7db9bf16670e7addb60ef3acbd1a4552b4180e25caef63"
     },
-    "android-automation": {
-      "source": "galiprandi/skills",
-      "sourceType": "github",
-      "skillPath": "android-automation/SKILL.md",
-      "computedHash": "aa4ff988f338b8c4c3b3efd7ac57fa00afc8dcd678c2590f0f11dad0ef6da357"
-    },
     "autogen": {
       "source": "galiprandi/skills",
       "sourceType": "github",
