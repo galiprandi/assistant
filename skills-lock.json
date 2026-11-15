@@ -18,6 +18,12 @@
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
       "computedHash": "6fc6c36d5926c4974ab8ba5c96fd9e98b69e68de5b62adb1cbeb1bad173904e1"
+    },
+    "remote-desktop": {
+      "source": "galiprandi/skills",
+      "sourceType": "github",
+      "skillPath": "remote-desktop/SKILL.md",
+      "computedHash": "41fcb393181ceccc750553804fc0a2d879da3775fd55c21addf577966cd71ddb"
     }
   }
 }
