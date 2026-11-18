@@ -79,9 +79,9 @@ persisted in `.browser-profile/`.
 1. **Known remote method** — check the table below and the site's guide in
    `browser-automation`. The agent fills non-secret fields (email, phone,
    username); secrets are completed by the user's own flow on their device.
-2. **Remote screen share** — `browser-share.js` gives the user live
-   view+control of this browser from their phone (see browser-automation
-   skill). Use when the site only supports on-screen auth.
+2. **Remote screen** — the `remote-desktop` skill gives the user live
+   view+control of the whole desktop from their phone. Use when the site
+   only supports on-screen auth.
 3. **On-screen login** — only when the user can see/interact with the
    browser directly. Say how they'll see it BEFORE opening it.
 4. **Unsupported** — no remote method and no way for the user to interact
@@ -100,10 +100,16 @@ App not listed → don't improvise: ask the user, or treat it as screen-only.
 
 - `.browser-profile/` is the only credential store — never export cookies,
   tokens or passwords to files, chat, or other tools.
-- Never ask for passwords, PINs or 2FA codes in chat — bridge messages are
-  logged. Secrets are typed by the user on a screen they control, or arrive
-  via the site's own remote flow.
-- The agent never logs in *for* the user and never solves captchas.
+- **One-time codes are fine in chat** — 2FA/OTP/login/device codes may be
+  sent by the user through the bridge for ANY site, including identity
+  providers. The user approves the action on their own device; the code
+  only authorizes what they are already seeing. The agent may type them.
+- **Passwords and long-lived secrets are never shared** — no passwords, PINs,
+  recovery codes, API keys or session tokens in chat or files. If a flow
+  requires one, the user types it on a screen they control (remote-desktop)
+  or uses the site's own remote flow.
+- The agent never solves captchas programmatically — ask the user for the
+  token or hand over the screen.
 - Before acting on an account, verify WHICH account is logged in.
 - Session expired or repeated login failure → reopen and ask the user; no
   credential guessing or brute force.
@@ -131,8 +137,9 @@ Primary tools (full details in each `SKILL.md`):
 
 - **browser-automation** — browser control via agent-browser. This is the
   bible for all web work: always via the wrapper, and ALWAYS consult the
-  site's guide before acting on it. Never log in for the user, never solve
-  captchas, preserve other agents' tabs. Contribute learnings back to
+  site's guide before acting on it. One-time codes may arrive via chat;
+  passwords never. Never solve captchas programmatically, preserve other
+  agents' tabs. Contribute learnings back to
   `galiprandi/skills`.
 - **communication** — writing/sending as the user: style profile +
   draft → approve → send → verify → follow-up pipeline. Read before any
