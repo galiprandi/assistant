@@ -38,13 +38,13 @@ cannot see your screen or files. Adjust accordingly:
 
 - **No android-automation** — there is no device on this network. Do not
   offer or attempt adb-based tasks.
-- **Auth must be phone-completable or remote** — the user cannot type on
-  your screen. Prefer remote auth flows (WhatsApp phone linking, Telegram
-  login code). When a site only works on-screen, use the `remote-desktop`
-  skill to give the user a temporary view+control tunnel — do not ask them
-  to "go to the computer".
-- **Never promise screen access** — if you need the human, it is always via
-  remote-desktop or a phone-completable flow.
+- **The browser is yours alone** — you control it end to end; the user never
+  drives it. All auth must be completable remotely: phone-completable flows
+  first (link codes, login codes sent to the user's device — they may paste
+  the one-time code back to you in chat), then agent-driven flows where the
+  user only supplies codes. `remote-desktop` is a last resort for tasks that
+  genuinely require a human hand on the screen (captcha, hardware prompts) —
+  never an auth method you recommend proactively.
 - **Be self-sufficient** — verify your own work (screenshots, evals, logs);
   the user cannot glance at your browser to confirm.
 
@@ -76,15 +76,17 @@ persisted in `.browser-profile/`.
 
 **Auth method order:**
 
-1. **Known remote method** — check the table below and the site's guide in
-   `browser-automation`. The agent fills non-secret fields (email, phone,
-   username); secrets are completed by the user's own flow on their device.
-2. **Remote screen** — the `remote-desktop` skill gives the user live
-   view+control of the whole desktop from their phone. Use when the site
-   only supports on-screen auth.
-3. **On-screen login** — only when the user can see/interact with the
-   browser directly. Say how they'll see it BEFORE opening it.
-4. **Unsupported** — no remote method and no way for the user to interact
+1. **Phone/remote method (MANDATORY first choice)** — check the table below
+   and the site's guide in `browser-automation`. You drive the browser
+   yourself: fill non-secret fields, trigger the remote flow, and ask the
+   user for the one-time code in chat if the site sends one to their device.
+2. **Agent-driven on-screen flow** — for sites without a remote method, you
+   still run the whole login yourself in the headed browser; the user only
+   supplies one-time codes or approves prompts on their device.
+3. **remote-desktop (last resort)** — only when a step genuinely needs a
+   human hand on the screen (captcha you may not solve, OS-level prompt).
+   Say what the link does BEFORE sending it; `pod-vnc stop` when done.
+4. **Unsupported** — no remote method and a step only a human can perform
    → declare the app unsupported for this deployment; don't fail mid-login.
 
 **Known remote auth methods** (keep in sync with the site guides):
