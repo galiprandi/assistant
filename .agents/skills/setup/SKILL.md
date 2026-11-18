@@ -1,6 +1,6 @@
 ---
 name: setup
-version: "1.1.0"
+version: "1.1.1"
 description: First-run onboarding skill. Runs as a guided conversation — infers the user's work/personal context, configures identity, autonomy, channels, tone, and app access with phone-first auth, and seeds routine-skill stubs. Runs only once; onboarding continues through daily use.
 allowed-tools: Bash(*) Read(*) Write(*) Edit(*) Glob(*) Grep(*)
 metadata:
@@ -79,7 +79,7 @@ never via a form.
 While chatting, listen for recurring activities or life domains (gym,
 work routines, studies, caretaking, a person's care...). For each one,
 create `.agents/skills/<domain>/SKILL.md` as a placeholder stub — see
-"Life-routine mentions" in `AGENTS.md`. Mention each stub once, in
+"Recurring tasks" in `AGENTS.md`. Mention each stub once, in
 passing. This is how the profile grows from day one: non-invasively.
 
 ### Step 7 — App access
@@ -334,6 +334,6 @@ After setup, the agent should:
 5. **Keep onboarding forever** — this skill is the bootstrap, not the whole
    onboarding. Every session, proactively detect and persist new user
    preferences, habits and routines (see "Onboarding is continuous" and
-   "Life-routine mentions" in AGENTS.md): likes, formats, contacts, brands,
+   "Recurring tasks" in AGENTS.md): likes, formats, contacts, brands,
    habits. Recurring activities get `.agents/skills/<domain>/` stubs that
    fill up over time. The profile is never finished.

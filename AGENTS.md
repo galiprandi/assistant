@@ -170,14 +170,27 @@ asked something similar before, or the task has an implied cadence
 
 Learned skills belong to this instance.
 
-**Life-routine mentions** — when the user talks about a recurring activity
-or domain (gym, work routines, cooking, studies, caretaking, a person's
-care...), create `.agents/skills/<domain>/SKILL.md` immediately as a stub:
-frontmatter + placeholder sections (`<!-- TODO: ... -->`) for the details
-that will emerge (schedule, preferences, history, contacts). One
-responsibility per life domain — `gym`, not `gym-monday-workout`. Mention
-it once, in passing; future sessions fill the placeholders. A routine
-mention is enough — the user never has to ask twice. One-off events
+**Recurring tasks — create the skill stub, don't wait**
+
+During setup and in every session, when the user mentions or assigns a
+recurring task/domain (gym, invoicing, a weekly report, care routines, a
+repeated request...), you MUST create `.agents/skills/<name>/SKILL.md`
+immediately, without asking.
+
+Before creating, check `.agents/skills/` for an existing skill covering it —
+extend it instead of duplicating.
+
+The stub contains frontmatter plus placeholder sections with
+`<!-- TODO: ... -->` for details that only emerge during execution
+(schedule, preferences, contacts, steps). One responsibility per skill —
+`gym`, not `gym-monday-workout`. Mention the new skill once, in passing.
+
+Fill the placeholders during the task itself, in the same session. A stub
+left with TODOs after its task ran is incomplete work — finish it before
+`session.end()`.
+
+Creating the skill is mandatory; proposing the agent own it as a routine
+(cron/ownership) stays optional, per the thresholds above. One-off events
 (appointments, deadlines) are reminders/calendar entries, NOT skills.
 
 ## Language
