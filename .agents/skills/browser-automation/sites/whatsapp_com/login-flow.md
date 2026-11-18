@@ -1,6 +1,6 @@
 ---
 name: whatsapp-web-login
-description: WhatsApp Web sign-in via phone-number linking (8-char code typed on the phone). Use when opening WhatsApp Web via agent-browser — the flow completes on the user's phone, but the browser MUST run headed (headless session establishment fails).
+description: WhatsApp Web sign-in via phone-number linking (8-char code typed on the phone). Use when opening WhatsApp Web via agent-browser — works headless, no screen needed.
 ---
 
 # WhatsApp Web Login Flow
@@ -9,18 +9,18 @@ Guide for linking WhatsApp Web to an existing phone account. Validated against `
 
 ## Preferred method — link with phone number (no screen needed)
 
-The whole flow completes on the user's phone: the agent drives the browser, the user only types a code on their own device. **Always prefer this over QR** — simpler even when a screen is available. **The browser must run headed** (`--headed`): WhatsApp session establishment fails in headless mode (verified 2026-11).
+The whole flow completes on the user's phone: the agent drives the browser, the user only types a code on their own device. **Always prefer this over QR** — it works headless and is simpler even when a screen is available.
 
 ```bash
-node .agents/skills/browser-automation/scripts/browser.js open "https://web.whatsapp.com/" --headed
+node .agents/skills/browser-automation/scripts/browser.js open "https://web.whatsapp.com/"
 ```
 
-1. **Open WhatsApp Web headed**. The login screen shows two buttons: "Vincular con el número de teléfono" and "Iniciar sesión con número de teléfono" — both lead to the same flow.
+1. **Open WhatsApp Web** (headless is fine). The login screen shows two buttons: "Vincular con el número de teléfono" and "Iniciar sesión con número de teléfono" — both lead to the same flow.
 2. **Click "Iniciar sesión con número de teléfono"** (`find text "número de teléfono" click`, or its `@eN` ref from `snapshot -i`).
 3. **Select country + enter phone number.** The country button shows flag + dial code and opens a searchable listbox (type the country name to filter). The phone field is prefilled with the dial code — type the local number only.
 4. **Click "Siguiente".**
 5. **Read the 8-character code** the page now displays (`exec read` or `snapshot`) and **give it to the user**. On their phone they tap the "Ingresar código" notification, confirm the device (name/location shown), verify identity if prompted (biometric/PIN), and type the code.
-6. **Done** — the browser loads the chat list. Session persists in `.browser-profile`; subsequent opens can go headless (`close` → `open` without `--headed`).
+6. **Done** — the browser loads the chat list. Session persists in `.browser-profile`; subsequent opens are headless.
 
 ### Notes
 

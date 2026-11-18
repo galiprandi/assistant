@@ -5,31 +5,36 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "acp-connector/SKILL.md",
-      "computedHash": "d8601ed7b069237992f304c781b845339119b36fdebec998309c33bdaf1b3fe5"
+      "computedHash": "d8601ed7b069237992f304c781b845339119b36fdebec998309c33bdaf1b3fe5",
+      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
     },
     "agent-desk": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "agent-desk/SKILL.md",
-      "computedHash": "fcaba34d6aecd1193a7db9bf16670e7addb60ef3acbd1a4552b4180e25caef63"
+      "computedHash": "fcaba34d6aecd1193a7db9bf16670e7addb60ef3acbd1a4552b4180e25caef63",
+      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
     },
     "autogen": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "autogen/SKILL.md",
-      "computedHash": "3786a1a33ea1284b75510ac77b6517da3f57a2aa9d160f92733570fb810c9668"
+      "computedHash": "3786a1a33ea1284b75510ac77b6517da3f57a2aa9d160f92733570fb810c9668",
+      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
     },
     "browser-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "6fc6c36d5926c4974ab8ba5c96fd9e98b69e68de5b62adb1cbeb1bad173904e1"
+      "computedHash": "2dcc87a3bb73aaaa857d5cf7462a2e8e58cb8b17ab066b5be7c10425ac34a764",
+      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
     },
     "remote-desktop": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "remote-desktop/SKILL.md",
-      "computedHash": "ecc606881e4cdc55c57d5488c58f8e77bac7819abb325a456f3fe8b4090eee0b"
+      "computedHash": "ecc606881e4cdc55c57d5488c58f8e77bac7819abb325a456f3fe8b4090eee0b",
+      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
     }
   }
 }
