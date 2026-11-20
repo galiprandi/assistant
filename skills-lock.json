@@ -29,6 +29,13 @@
       "computedHash": "2dcc87a3bb73aaaa857d5cf7462a2e8e58cb8b17ab066b5be7c10425ac34a764",
       "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
     },
+    "media-to-text": {
+      "source": "galiprandi/skills",
+      "commit": "0764d9300a8b4ec73256a3e53983d3603027271e",
+      "sourceType": "github",
+      "skillPath": "media-to-text/SKILL.md",
+      "computedHash": "dc28a11b1bbe5b9a2c5cb5a9fe3253c791522f5428c0404987c99f24a8dd738b"
+    },
     "remote-desktop": {
       "source": "galiprandi/skills",
       "sourceType": "github",
