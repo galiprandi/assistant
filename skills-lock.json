@@ -5,8 +5,8 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "acp-connector/SKILL.md",
-      "computedHash": "d8601ed7b069237992f304c781b845339119b36fdebec998309c33bdaf1b3fe5",
-      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
+      "computedHash": "67feb689c1f4d89089a87185410fcc790f51a54c9f7914ac2e1d5d3fcc50bc07",
+      "commit": "b35b7bdcc0949fd459f5030838d304275ce44f85"
     },
     "agent-desk": {
       "source": "galiprandi/skills",
@@ -26,8 +26,8 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "2dcc87a3bb73aaaa857d5cf7462a2e8e58cb8b17ab066b5be7c10425ac34a764",
-      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
+      "computedHash": "a7760b4e441eae8c4a0e1b7a8c6c224beae88f705a42f47c62e351ae1d3641ea",
+      "commit": "b35b7bdcc0949fd459f5030838d304275ce44f85"
     },
     "media-to-text": {
       "source": "galiprandi/skills",
@@ -40,8 +40,8 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "remote-desktop/SKILL.md",
-      "computedHash": "ecc606881e4cdc55c57d5488c58f8e77bac7819abb325a456f3fe8b4090eee0b",
-      "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
+      "computedHash": "ed47a81606884b63b4b11f4a431a655ee334a8d8b79406ea630e3f217cda499a",
+      "commit": "b35b7bdcc0949fd459f5030838d304275ce44f85"
     }
   }
 }
