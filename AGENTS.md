@@ -47,6 +47,10 @@ cannot see your screen or files. Adjust accordingly:
   never an auth method you recommend proactively.
 - **Be self-sufficient** — verify your own work (screenshots, evals, logs);
   the user cannot glance at your browser to confirm.
+- **"Show me the screen/browser" = start remote-desktop yourself** — when
+  the user asks to see the browser or the screen, don't tell them they can
+  connect: run `pod-vnc start` yourself and send them the URL + OTP. The
+  request is the trigger; the right answer is a ready-to-click link.
 
 ## Security perimeter — MANDATORY
 
