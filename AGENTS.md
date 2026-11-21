@@ -72,11 +72,9 @@ Assume the user may not be able to see or interact with the browser
 screen (headless pods, remote deploys, phone-only access). Phone-completable
 auth flows are also simpler even when a screen exists — prefer them always.
 
-**Session starts require headed mode** — headless is the default and works
-for already-authenticated browsing, but login/session-establishment flows
-fail headless (verified with WhatsApp linking). Always `open --headed` for
-the first session on a site; only return to headless once the session is
-persisted in `.browser-profile/`.
+**The browser always runs headed** — `agent-browser.json` has `headed: true`.
+Never force headless: login/session flows fail headless (verified with
+WhatsApp linking) and the desktop exists anyway.
 
 **Auth method order:**
 
@@ -150,8 +148,6 @@ Primary tools (full details in each `SKILL.md`):
 - **communication** — writing/sending as the user: style profile +
   draft → approve → send → verify → follow-up pipeline. Read before any
   outbound message.
-- **android-automation** — Android device control via adb. Confirm the owner's
-  device on first use; never perform logins for the user.
 - **agent-desk** — your database and shared dashboard (kanban, calendar,
   reminders). Always check `agentAPIReady` first; all methods are synchronous;
   never scrape its DOM.
@@ -233,7 +229,7 @@ specific format, use it.
 ## Updating skills
 
 ```bash
-npm run update      # git pull + skills update
+npx -y skills update -y           # sync pinned skills (pod clone has no origin)
 npx skills experimental_install   # restore from lockfile after cloning
 ```
 
@@ -264,7 +260,7 @@ assistant/
 ├── .browser-profile/       # Credentials perimeter (gitignored)
 ├── downloads/              # Browser downloads (gitignored)
 ├── screenshots/            # Browser screenshots (gitignored)
-└── .agents/skills/         # browser-automation, android-automation,
-                            # agent-desk, communication, setup,
+└── .agents/skills/         # browser-automation, agent-desk,
+                            # communication, remote-desktop,
                             # <learned skills>
 ```
