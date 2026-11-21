@@ -29,16 +29,6 @@ Environment: `BROWSER_DEBUG=1` for verbose logging; `AGENT_BROWSER_*` vars pass 
 
 See `SKILL.md` for the full usage reference.
 
-## `transcribe-audio.js`
-
-Local audio→text transcription (sherpa-onnx Parakeet via the `audio-transcription` npm package). No API keys, no cloud — audio never leaves the machine. Auto-installs the package into `~/.cache/agent-tools` on first use; the model/runtime (~640MB) downloads once into `~/.cache/audio-transcription`, shared by all agents on the machine.
-
-```bash
-node .agents/skills/browser-automation/scripts/transcribe-audio.js <audio-file> [--out f.txt] [--stdout-only] [--threads N]
-```
-
-See `../references/audio-transcription.md` for details and limitations.
-
 ## `teams.js`
 
 Helper for sending messages to Microsoft Teams web via keyboard automation. Useful for long or multiline messages where typing line by line manually is impractical.
@@ -113,15 +103,3 @@ Dependency-free test for the site-guide resolution logic in `browser.js` (`findG
 node .agents/skills/browser-automation/scripts/test-find-guide.js
 ```
 
-## `browser-share.js` + `viewer.html`
-
-Temporary remote view/control of the repo browser for the user (credential entry, "show me what you're doing", remote login). Default mode restarts this repo's browser with a single tab on the target URL (full isolation; other agents unaffected; cookies persist). `--attach` shares the running session with a remote tab switcher instead.
-
-```bash
-node .agents/skills/browser-automation/scripts/browser-share.js <url> [--ttl <sec>] [--viewport <WxH>] [--headed] [--lan]
-node .agents/skills/browser-automation/scripts/browser-share.js --attach [--ttl <sec>] [--lan]
-```
-
-Enables the agent-browser stream on a random port, serves `viewer.html` (minimal touch-friendly viewer) through a tiny HTTP+WebSocket bridge, and exposes it via an ephemeral `cloudflared` quick tunnel (PATH or `npx -y` fallback) or directly on the LAN with `--lan`. Prints a tokenized link; auto-tears-down after `--ttl` seconds (default and max 300; `--ttl 0` = infinite, explicit only). Requires Node >= 22; cloudflared optional.
-
-The viewer page is a separate `viewer.html` file — the script substitutes `%%K%%` (access token) and `%%EXPIRES%%` (epoch ms) placeholders when serving it.

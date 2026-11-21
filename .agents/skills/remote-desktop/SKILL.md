@@ -1,6 +1,6 @@
 ---
 name: remote-desktop
-version: "1.1.0"
+version: "1.1.1"
 description: Give the user temporary control of this machine's desktop when they must do something only a human can do on screen — sign in (username, password, 2FA), solve a captcha or anti-bot challenge, or simply look at the desktop. Reach for it as soon as the user says they need to log in, enter a password, complete a verification, or see the screen — do not wait to be asked for a tunnel. Ephemeral by design, never a routine automation tool or a permanent access channel.
 allowed-tools: Bash(*)
 metadata:
@@ -104,8 +104,31 @@ bash .agents/skills/remote-desktop/scripts/pod-vnc stop    # tears down + wipes 
   pick *Local Scaling* in the client settings if the screen overflows.
 - Never type or receive the user's password yourself. If they offer it, decline
   and point them to the tunnel.
+- Never send a URL from memory, conversation history or logs — quick tunnels are
+  ephemeral and a stale link silently goes nowhere. Always run `pod-vnc status`
+  (or `start`) and send exactly what it prints, URL + OTP together.
 - If the user reports the link does not load at all, check `status` first: the
   tunnel may be down, or their network may block `trycloudflare.com`.
+
+### Message template
+
+After `pod-vnc start`, send the user exactly this shape — URL and OTP
+copied verbatim from the command output, never from memory. Compute
+`{HH:MM}` as now + `POD_VNC_OTP_TTL` (default 300 s → 5 min ahead):
+
+```
+Tu conexión está lista ✅
+
+🔗 URL: {URL}
+
+🔑 Código: `{OTP}`
+
+Disponible hasta las {HH:MM}hs. No lo compartas.
+```
+
+Keep it to these lines — no extra warnings or paragraphs. If the site is
+known to reject Safari (it always is), mention "abrilo en Chrome" only if
+the user asks or reports a problem.
 
 ## Rules
 

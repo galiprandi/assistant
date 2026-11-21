@@ -5,37 +5,43 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "acp-connector/SKILL.md",
-      "computedHash": "d8601ed7b069237992f304c781b845339119b36fdebec998309c33bdaf1b3fe5"
+      "computedHash": "67feb689c1f4d89089a87185410fcc790f51a54c9f7914ac2e1d5d3fcc50bc07",
+      "commit": "0bae56c909bbe52d8c057cabe5f287b809b85cd9"
     },
     "agent-desk": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "agent-desk/SKILL.md",
-      "computedHash": "fcaba34d6aecd1193a7db9bf16670e7addb60ef3acbd1a4552b4180e25caef63"
+      "computedHash": "fcaba34d6aecd1193a7db9bf16670e7addb60ef3acbd1a4552b4180e25caef63",
+      "commit": "0bae56c909bbe52d8c057cabe5f287b809b85cd9"
     },
     "android-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "android-automation/SKILL.md",
-      "computedHash": "aa4ff988f338b8c4c3b3efd7ac57fa00afc8dcd678c2590f0f11dad0ef6da357"
+      "computedHash": "aa4ff988f338b8c4c3b3efd7ac57fa00afc8dcd678c2590f0f11dad0ef6da357",
+      "commit": "0bae56c909bbe52d8c057cabe5f287b809b85cd9"
     },
     "autogen": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "autogen/SKILL.md",
-      "computedHash": "3786a1a33ea1284b75510ac77b6517da3f57a2aa9d160f92733570fb810c9668"
+      "computedHash": "3786a1a33ea1284b75510ac77b6517da3f57a2aa9d160f92733570fb810c9668",
+      "commit": "0bae56c909bbe52d8c057cabe5f287b809b85cd9"
     },
     "browser-automation": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "6fc6c36d5926c4974ab8ba5c96fd9e98b69e68de5b62adb1cbeb1bad173904e1"
+      "computedHash": "a7760b4e441eae8c4a0e1b7a8c6c224beae88f705a42f47c62e351ae1d3641ea",
+      "commit": "0bae56c909bbe52d8c057cabe5f287b809b85cd9"
     },
     "remote-desktop": {
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "remote-desktop/SKILL.md",
-      "computedHash": "ecc606881e4cdc55c57d5488c58f8e77bac7819abb325a456f3fe8b4090eee0b"
+      "computedHash": "c75b3cb53ec72b54fa28177cb0f692aa395e723a01d67d07bbd18e6eb08b7899",
+      "commit": "0bae56c909bbe52d8c057cabe5f287b809b85cd9"
     }
   }
 }
