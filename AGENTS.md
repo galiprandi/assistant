@@ -50,11 +50,9 @@ Assume the user may not be able to see or interact with the browser
 screen (headless pods, remote deploys, phone-only access). Phone-completable
 auth flows are also simpler even when a screen exists — prefer them always.
 
-**Session starts require headed mode** — headless is the default and works
-for already-authenticated browsing, but login/session-establishment flows
-fail headless (verified with WhatsApp linking). Always `open --headed` for
-the first session on a site; only return to headless once the session is
-persisted in `.browser-profile/`.
+**The browser always runs headed** — `agent-browser.json` has `headed: true`.
+Never force headless: login/session flows fail headless (verified with
+WhatsApp linking) and the desktop exists anyway.
 
 **Auth method order:**
 
