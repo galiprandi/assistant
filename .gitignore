@@ -13,7 +13,9 @@ node_modules/
 docs/.vitepress/dist/
 docs/.vitepress/cache/
 # acp-connector config (Telegram/Discord bot tokens)
+acp-connector.*.jsonc
 acp-connector.jsonc
+acp-connector-*.jsonc
 # Remote-channel uploads (media.uploadsDir)
 uploads/
 # Local state
