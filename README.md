@@ -131,6 +131,7 @@ npm run update         Pull repo updates (git pull) + update skills
 ### Installed from `galiprandi/skills` (maintained)
 
 - **browser-automation** — control a browser via agent-browser (navigate, fill forms, read content, call internal site APIs)
+- **assistant** — contact/person data doctrine: Google Contacts as source of truth, CSV fallback, deduplication, and write-safety rules
 - **agent-desk** — dashboard with sync API for tasks, events, sessions, and config
 - **android-automation** — control an Android device via adb
 
@@ -247,6 +248,9 @@ assistant/
 │       │   ├── scripts/browser.js
 │       │   ├── references/     # golden-rules, api-capture, etc.
 │       │   └── sites/          # per-app guides (gmail, whatsapp, ...)
+│       ├── assistant/          # Contact/person data doctrine
+│       │   ├── SKILL.md
+│       │   └── templates/
 │       ├── android-automation/ # Android control via adb
 │       ├── agent-desk/         # Dashboard API for tasks/events/sessions
 │       │   ├── SKILL.md

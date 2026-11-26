@@ -15,6 +15,14 @@
       "computedHash": "fcaba34d6aecd1193a7db9bf16670e7addb60ef3acbd1a4552b4180e25caef63",
       "commit": "09af0a56ebf0565cea5dd52ab05242cdcde33f33"
     },
+    "assistant": {
+      "source": "galiprandi/skills",
+      "commit": "b160a9fa2d1b893b32da4d32fd2bb9104b83f101",
+      "sourceType": "github",
+      "skillPath": "assistant/SKILL.md",
+      "computedHash": "7fc1a78f42d2d5e1b04d1d6d7f6f96d2d37252a3041f83c5be3846e751049d92",
+      "installMode": "copy"
+    },
     "autogen": {
       "source": "galiprandi/skills",
       "sourceType": "github",
@@ -26,8 +34,8 @@
       "source": "galiprandi/skills",
       "sourceType": "github",
       "skillPath": "browser-automation/SKILL.md",
-      "computedHash": "a7760b4e441eae8c4a0e1b7a8c6c224beae88f705a42f47c62e351ae1d3641ea",
-      "commit": "b35b7bdcc0949fd459f5030838d304275ce44f85"
+      "computedHash": "34ef454176101485b8ab20c45cf9e69d54ed6aa40d5931804b59f481f2915d6c",
+      "commit": "7b45e85c02bcbe4eb77ce3e6d643a18c48f58e76"
     },
     "media-to-text": {
       "source": "galiprandi/skills",

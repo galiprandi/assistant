@@ -148,6 +148,9 @@ Primary tools (full details in each `SKILL.md`):
   passwords never. Never solve captchas programmatically, preserve other
   agents' tabs. Contribute learnings back to
   `galiprandi/skills`.
+- **assistant** — personal-assistant data-management doctrine. Use it for
+  people/contact data: Google Contacts is the source of truth when available,
+  CSV is temporary fallback only, and browser-automation handles UI mechanics.
 - **communication** — writing/sending as the user: style profile +
   draft → approve → send → verify → follow-up pipeline. Read before any
   outbound message.
@@ -263,7 +266,7 @@ assistant/
 ├── .browser-profile/       # Credentials perimeter (gitignored)
 ├── downloads/              # Browser downloads (gitignored)
 ├── screenshots/            # Browser screenshots (gitignored)
-└── .agents/skills/         # browser-automation, agent-desk,
+└── .agents/skills/         # assistant, browser-automation, agent-desk,
                             # communication, remote-desktop,
                             # <learned skills>
 ```
