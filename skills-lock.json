@@ -17,11 +17,10 @@
     },
     "assistant": {
       "source": "galiprandi/skills",
-      "commit": "b160a9fa2d1b893b32da4d32fd2bb9104b83f101",
+      "commit": "b970a69ce82b522f19cf80876f0729e978ae5712",
       "sourceType": "github",
       "skillPath": "assistant/SKILL.md",
-      "computedHash": "7fc1a78f42d2d5e1b04d1d6d7f6f96d2d37252a3041f83c5be3846e751049d92",
-      "installMode": "copy"
+      "computedHash": "1689dada799526b097d2397c5c97bbeabec2da04791de5136b4f35c7ce36004b"
     },
     "autogen": {
       "source": "galiprandi/skills",
